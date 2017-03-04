@@ -15,8 +15,7 @@
   <target name="compile" depends="init" 
         description="Compile the source">
     <!-- Compile the java code into ${build} -->
-    <javac classpathref="project.class.path"  
-	    srcdir="./"
+    <javac srcdir="./"
            destdir="${build}"
 	   debug="true" debuglevel="lines,vars,source">
 	<!--<compilerarg value="-Xlint:unchecked"/>-->
