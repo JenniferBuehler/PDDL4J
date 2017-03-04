@@ -30,8 +30,8 @@ This entails the following changes:
 - A few minor bug fixes detailed in the per-file changes list below.
 - Imporved type usage / type safety: New type support added in type/Type.java allows sub-types, like in traditional inheritance-fashion.
   This allows for example to check whether a variable of type A can be bound to a term of type B, which is only legal
-  if B is a subtype (or same type) of A. This involved the deletion of *pddl4j/exp/type/TypeSet.java*, as all the support is
-  now offered in *pddl4j/exp/type/Type.java*. For more information about the changes, refer to the files change list below, and/or the source.
+  if B is a subtype (or same type) of A. For more information about the changes, refer to the files change list of
+  *exp/type/Type.java* and *exp/type/TypeSet.java* below, and/or the source.
 
 ## List of specific changes per file in the pddl4j/exp directory
 
@@ -219,6 +219,8 @@ This entails the following changes:
     - ``getCommonParentWith(Type type)``, returns type which is a common parent of this and *type* (if it exists)
     - ``getParentTypes()`` return all parent types (as passed in constructor)
     - ``toDetailedString()`` to print more information (incl parent types) than ``toString()`` does.
+- type/TypeSet.java
+    * TODO
 
 - AbstractExp.java
   * Added function to accept visitors: ``Object accept(ExpVisitor, Object)``
