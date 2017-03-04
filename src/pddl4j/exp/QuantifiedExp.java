@@ -198,7 +198,6 @@ public abstract class QuantifiedExp extends AbstractExp implements
      * 
      * @param sigma the substitution.
      * @return a substituted copy of this expression.
-     * XXX change: old was additionally that substituted copy only returned if all bound variables are not instantiated; the
      *         quantified copy expression otherwise.
      * @throws NullPointerException if <code>sigma == null</code>.
      */
@@ -208,16 +207,6 @@ public abstract class QuantifiedExp extends AbstractExp implements
         QuantifiedExp other = this.clone();
         other.exp = this.exp.apply(sigma);
         return other;
-	/*
-	Iterator<Variable> i = other.vars.iterator();
-        while (i.hasNext()) {
-            Variable var = i.next();
-            if (!other.exp.occurs(var)) {
-                i.remove();
-            }
-        }
-	//System.out.println("This :"+this+" - other "+other);
-        return other.vars.isEmpty() ? other.exp : this;*/
     }
 
     /**

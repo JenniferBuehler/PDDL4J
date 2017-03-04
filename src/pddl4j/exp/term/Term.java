@@ -34,7 +34,6 @@ import java.util.Map;
 
 import pddl4j.exp.Exp;
 import pddl4j.exp.type.Type;
-//import pddl4j.DeepCloneable;
 
 /**
  * This interface define all the method applicable to a PDDL term.

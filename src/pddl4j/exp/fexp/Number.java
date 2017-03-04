@@ -48,8 +48,6 @@ public final class Number extends FExp implements Comparable<Number> {
      * The serial version id of this class.
      */
     private static final long serialVersionUID = 6081884046144807572L;
-    //private static final Number UNDEFINED = new Number(0.0);
-
 
     /**
      * Create a new number with a specific value.

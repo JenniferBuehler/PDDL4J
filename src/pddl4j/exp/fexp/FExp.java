@@ -67,20 +67,7 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
      * The list of the arguments of this function head.
      */
     private ArrayList<Term> arguments;
-    
-    /**
-     * Create an empty function with a specific functor.
-     * 
-     * @param id the term id of this function.
-     * @param functor The function functor.
-     * @throws NullPointerException if <code>id == null</code> or
-     *             <code>functor == null</code> or <code>type == null</code>.
-     */
-    protected FExp(TermID id, String functor) {
-        super(id, functor);
-        this.arguments = new ArrayList<Term>();
-    }
-    
+        
     /**
      * Create an empty function with a specific functor.
      * 
@@ -258,8 +245,6 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
         return this.arguments.iterator();
     }
 
-
-
     /**
      * Unify this term with an other specified term. Note, call unify does not modify
      * the parameters of this method. 
@@ -271,7 +256,7 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
      * @see pddl4j.exp.term.Term#unify(Term, Substitution)  
      * @throws BindingException if the term to unify with this function is a
      *             function with the same symbol and the same arity and has an
-     *             incompatible type, i.e.,
+     *             incompatible type.
      */
     public final Substitution unify(Term term) { 
        return this.unify(term, new Substitution()); 
@@ -289,17 +274,17 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
      *         binding constraints allows to unify the two terms.
      * @throws BindingException if the term to unify with this function is a
      *             function with the same symbol and the same arity and has an
-     *             incompatible type, i.e.,
+     *             incompatible type.
      */
     public final Substitution unify(Term term, Substitution sigma) {
         if (term.getTermID().equals(TermID.VARIABLE)) {
             return term.unify(this, sigma);
         } else {
             FExp func = (FExp) term;
-            if (func.getImage().equals(this.getImage()) && (func.getArity() == this.getArity())) {
-		//System.out.println("Unifying "+this.toTypedString()+" other "+term.toTypedString());
-                //if (this.getType().getSubTypes().containsAll(func.getType().getSubTypes())) {
-                if (this.getType().isSubTypeOf(func.getType()) || func.getType().isSubTypeOf(this.getType())) {
+            if (func.getImage().equals(this.getImage())
+		 && (func.getArity() == this.getArity())) {
+                if (this.getType().isSubTypeOf(func.getType())
+		    || func.getType().isSubTypeOf(this.getType())) {
                     Substitution theta = sigma.shallowClone();
                     int i = 0;
                     boolean failure = false;

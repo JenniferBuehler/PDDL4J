@@ -32,7 +32,6 @@ package pddl4j.exp.term;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.List;
 
 import pddl4j.exp.Exp;
 import pddl4j.exp.fexp.FExp;
@@ -54,16 +53,6 @@ public final class Constant extends FExp implements Comparable<Constant> {
 
     public static final String UNDEFINED_SYMBOL = "undefined";
     public static final Constant UNDEFINED = new Constant(UNDEFINED_SYMBOL,Type.OBJECT);
-    
-    /**
-     * Creates a new constant of type object with a specified image.
-     * 
-     * @param image the image of the constant.
-     * @throws NullPointerException if <code>image == null</code>.
-     */
-    public Constant(String image) {
-        super(TermID.CONSTANT, image);
-    }
     
    
     /**

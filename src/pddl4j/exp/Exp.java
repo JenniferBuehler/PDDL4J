@@ -33,14 +33,11 @@ package pddl4j.exp;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
 
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.Variable;
 import pddl4j.ExpVisitor;
-//import pddl4j.DeepCloneable;
 
 /**
  * This interface is implemented by all expression of the PDDL language.
@@ -97,7 +94,6 @@ public interface Exp extends Serializable, Cloneable {
      */
     String toString();
 
- 
     /**
      * Returns <code>true</code> if a term occurs in this expression.
      * 
@@ -107,7 +103,6 @@ public interface Exp extends Serializable, Cloneable {
      * @throws NullPointerException if <code>term == null</code>.        
      */
     boolean occurs(Term term);
-
     
     /**
      * Substitutes all occurrences of the variables that occur in this
@@ -118,8 +113,7 @@ public interface Exp extends Serializable, Cloneable {
      * @throws NullPointerException if <code>sigma == null</code>.
      */
     Exp apply(Substitution sigma);
-     
-    
+      
     /**
      * Standardizes all occurrences of the variables that occur in this
      * expression. Remember that free variables are existentially quantified.

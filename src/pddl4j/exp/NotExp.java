@@ -33,7 +33,6 @@ package pddl4j.exp;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
@@ -124,7 +123,6 @@ public class NotExp extends AbstractExp {
             throw new NullPointerException();
         return new NotExp(this.exp.apply(sigma));
     }
-
 
     /**
      * Standardizes all occurrences of the variables that occur in this

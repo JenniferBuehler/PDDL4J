@@ -78,8 +78,6 @@ public class WhenExp extends AbstractExp {
         this.condition = condition;
         this.effect = effect;
     }
-
-
     
     /**
      * Creates a new conditional expression.

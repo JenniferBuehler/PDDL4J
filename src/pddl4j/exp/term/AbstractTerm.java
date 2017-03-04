@@ -67,24 +67,6 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
      */
     private TermID id;
    
-    /**
-     * Creates a new term with a specified term id, image type and gound flag
-     * property.
-     * 
-     * @param id The id expression of this term.
-     * @param image the image of the term.
-     * @throws NullPointerException if <code>id == null</code> or
-     *        <code>image == null</code> or <code>type == null</code>.
-     */
-    protected AbstractTerm(TermID id, String image) {
-        super(ExpID.TERM);
-	throw new RuntimeException("At this stage, we should pass a type to the term always!");
-        /*this.id = id;
-        this.setImage(image);
-        Set<Type> pts = new LinkedHashSet<Type>();
-        pts.add(new Type(Type.OBJECT_SYMBOL, new LinkedHashSet<Type>()));
-        this.setType(new Type(Type.OBJECT_SYMBOL, pts));*/
-    }
     
     /**
      * Creates a new term with a specified term id, image type and ground flag
@@ -102,7 +84,6 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
         this.setImage(image);
         this.setType(type);
     }
-
 
     /**
      * Returns the term id of this term.
@@ -134,7 +115,6 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
         this.image = image;
     }
  
-   
     /**
      * Returns the type of the term.
      * 
@@ -143,10 +123,6 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
     public final Type getType() {
         return this.type;
     }
-
-    /*public final Type getOnlyType() {
-        return this.type.getOnlyType();
-    }*/
 
     /**
      * Sets a new type (the only one) to this term.

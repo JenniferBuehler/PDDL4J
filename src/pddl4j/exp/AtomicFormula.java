@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 import java.util.ArrayList;
 
 import pddl4j.exp.term.Substitution;
@@ -197,7 +196,6 @@ public class AtomicFormula extends AbstractExp implements Literal {
         return other;
     }
 
-
     /**
      * Matches this atomic formula with an other specified atomic formula. Two
      * atomic formulas match if they have the same predicate symbol and arity
@@ -235,7 +233,8 @@ public class AtomicFormula extends AbstractExp implements Literal {
      * @see pddl4j.exp.term.Term#unify(Term, Substitution)
      */
     public final Substitution match(AtomicFormula atom, Substitution sigma) {
-        if ((this.getArity() == atom.getArity()) && this.predicate.equals(atom.predicate)) {
+        if ((this.getArity() == atom.getArity()) &&
+             this.predicate.equals(atom.predicate)) {
             Substitution theta = sigma.shallowClone();
             int i = 0;
             boolean failure = false;

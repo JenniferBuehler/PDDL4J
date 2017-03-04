@@ -195,7 +195,8 @@ public abstract class AbstractActionDef implements ActionDef {
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof AbstractActionDef)) {
             AbstractActionDef other = (AbstractActionDef) obj;
-            return this.getName().equals(other.getName()) && this.parameters.equals(other.parameters);
+            return this.getName().equals(other.getName()) && 
+		   this.parameters.equals(other.parameters);
         }
         return false;
     }

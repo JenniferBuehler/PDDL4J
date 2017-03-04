@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 
 import pddl4j.exp.term.Substitution.Binding;
-//import pddl4j.DeepCloneable;
 
 
 /**
@@ -68,7 +67,8 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
    
 
     /**
-     * removes from this substitution all entries which have the same key as the substitutions in s.
+     * removes from this substitution all entries which have the same
+     * key as the substitutions in s.
      */
     public void subtractAll(Substitution s) {
         for (Map.Entry<Variable, Term> e : s.binding.entrySet()) {
@@ -86,11 +86,12 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
      * @return the previous term value associated with <code>var</code>,
      *         or <tt>null</tt> if there was no mapping term for <code>var</code>.
      * @throws NullPointerException if <code>var == null || term == null</code>.
+     * @throws BindingException if the type of <code>term</code> is not a
+     *         sub-type of <code>var</code>
      */
     public Term bind(final Variable var, final Term term) {
         if (var == null || term == null) 
             throw new NullPointerException();
-        //if (!var.getType().getSubTypes().containsAll(term.getType().getSubTypes())) {
         if (!term.getType().isSubTypeOf(var.getType())) {
             throw new BindingException("[\"" + var.toTypedString() + "\" = \"" + term.toTypedString() + "\"]");
         }
@@ -165,6 +166,12 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
             throw new Error();
         }
     }
+
+    /**
+     * Returns a shallow copy of the subtitution.
+     * 
+     * @return a shallow copy of the subtitution.
+     */
     public Substitution shallowClone() {
         try {
             Substitution other = (Substitution) super.clone();
@@ -248,7 +255,11 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
         return bindings.iterator();
     }
 
-    // XXX Had to add this method to allow for checking double Substitution entries in the map!!
+    /**
+     * Generate a hash code.
+     * Allows for checking double
+     * Substitution entries in the bindings map.
+     */
     public int hashCode() {
             return this.binding.hashCode();
     }

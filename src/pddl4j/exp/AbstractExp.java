@@ -31,11 +31,6 @@
 package pddl4j.exp;
 
 import pddl4j.ExpVisitor;
-import pddl4j.exp.term.Substitution;
-
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * This abstract class implements the common part of all PDDl expression.
  * 

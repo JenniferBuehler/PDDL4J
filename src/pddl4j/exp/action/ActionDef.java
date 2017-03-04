@@ -38,7 +38,6 @@ import java.util.Set;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.Exp;
-//import pddl4j.DeepCloneable;
 
 /**
  * This interface is implemented by all type of action defined in the PDDL
@@ -85,7 +84,6 @@ public interface ActionDef extends Iterable<Term>, Serializable, Cloneable {
      * @return the parameters of the action.
      */
     List<Term> getParameters();
-
     
     /**
      * Adds a parameter to this action.

@@ -55,8 +55,8 @@ public class TestCNF {
         
         // (and (forall (?x) (p1 ?x ?y)) (p2 ?x ?y))
         
-        Variable x = new Variable("?x");
-        Variable y = new Variable("?y");
+        Variable x = new Variable("?x", Type.OBJECT);
+        Variable y = new Variable("?y", Type.OBJECT);
         
         AtomicFormula p1 = new AtomicFormula("p1");
         p1.add(x);
@@ -112,9 +112,9 @@ public class TestCNF {
         
         
         
-        /*Variable x = new Variable("?x");
-        Variable y = new Variable("?y");
-        Variable z = new Variable("?z");
+        /*Variable x = new Variable("?x", Type.OBJECT);
+        Variable y = new Variable("?y", Type.OBJECT);
+        Variable z = new Variable("?z", Type.OBJECT);
         
         AtomicFormula animal = new AtomicFormula("animal");
         animal.add(y);
@@ -177,8 +177,8 @@ public class TestCNF {
         System.out.println("CNF:\n" + e9.toConjunctiveNormalForm());
         
         
-        /*Variable v1 = new Variable("v1");
-        Variable v2 = new Variable("v2");
+        /*Variable v1 = new Variable("v1", Type.OBJECT);
+        Variable v2 = new Variable("v2", Type.OBJECT);
         
         Constant c1 = new Constant("c1");
         Constant c2 = new Constant("c2");

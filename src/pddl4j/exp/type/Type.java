@@ -39,11 +39,11 @@ import java.util.Stack;
 import java.util.Map.Entry;
 import java.util.Iterator;
 
-//import pddl4j.DeepCloneable;
-
 /**
  * This class implements a type.
  * 
+ * @author Damien Pellier, modified by Jennifer Buehler
+ * @version 1.0
  */
 public class Type implements Serializable, Cloneable {
 
@@ -82,7 +82,7 @@ public class Type implements Serializable, Cloneable {
      * Creates a new type with a specific image and parent types. 
      * 
      * @param image the image of the type.
-     * @param hierarchy the type hierachy.
+     * @param parents the set of parent types.
      * @throws NullPointerException if <code>image == null</code> or
      *             <code>hierarchy == null</code>.
      * @throws TypingException if the type hierarchy specified is not
@@ -131,8 +131,9 @@ public class Type implements Serializable, Cloneable {
     //returns true if this type is either the same, or a subtype
     //of the other.
     public boolean isSubTypeOf(Type other){
-	//it is necessary to use isSameType(), and containedIn(), instead of parentTypes.contains(), because
-	//"other" could be of another type which has to do a different check
+	// it is necessary to use isSameType(), and containedIn(),
+        // instead of parentTypes.contains(), because
+	// "other" could be of another type which has to do a different check
 	return (other.isSameType(this)) || other.containedInParents(parentTypes);
     }
 
@@ -154,9 +155,11 @@ public class Type implements Serializable, Cloneable {
     }
 
 
-    //returns the type which is a common parent type of this type and the other,
-    //or null if there is no such common type. This function is useful if no
-    //type is a subtype of the other, but a common parent might exist.
+    /**
+     * Returns the type which is a common parent type of this type and the other,
+     * or null if there is no such common type. This function is useful if no
+     * type is a subtype of the other, but a common parent might exist.
+     */
     public Type getCommonParentWith(Type other){
 	Set<Type> intersect = new LinkedHashSet(this.getParentTypes());
         intersect.retainAll(other.getParentTypes());
@@ -184,7 +187,6 @@ public class Type implements Serializable, Cloneable {
     final protected void setParentTypes(Set<Type> p) {
 	parentTypes=p;
     }   
- 
      
     /**
      * Returns <code>true</code> if this type is equals to an other object.

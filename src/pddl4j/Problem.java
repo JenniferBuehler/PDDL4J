@@ -50,6 +50,9 @@ import pddl4j.exp.fexp.FHead;
 import pddl4j.exp.action.ActionDef;
 import pddl4j.exp.AtomicFormula;
 /**
+ * This interface defines the accessible methods from a problem.
+ * 
+ * @author Damien Pellier, significant modifications by Jennifer Buehler
  */
 public class Problem extends PDDLBase {
 

@@ -50,6 +50,9 @@ import pddl4j.exp.DerivedPredicate;
 import pddl4j.exp.term.Constant;
 
 /**
+ * This interface defines the accessible methods from a domain.
+ * 
+ * @author Damien Pellier, significant modifications by Jennifer Buehler
  */
 public class Domain extends PDDLBase {
 
@@ -284,7 +287,10 @@ public class Domain extends PDDLBase {
 		//System.out.println("Finalized full types: \n"+fullTypes);
 	}
 
-	//creates a map of all types found in the hierarchy and for each type adds a set of all its parent types
+	/**
+         * creates a map of all types found in the hierarchy and for each type
+         * adds a set of all its parent types
+         */
 	private Map<String,Set<Type>> createParentsMap(){
 		Map<String,Set<Type>> result= addAllParents(Type.OBJECT_SYMBOL,new LinkedHashSet<Type>());
 		//System.out.println("Overall Result: "+result);
@@ -294,8 +300,8 @@ public class Domain extends PDDLBase {
 	/**
 	 * Creates a map of all types found in the hierarchy starting from current typename, 
 	 * and for each type adds a set of all its parent types.
-	 * @param existing call this function with an empty set, this is a parameter that is needed for recursion to keep
-	 * track of all parents found so far for a type.
+	 * @param existing call this function with an empty set, this is a parameter
+         * that is needed for recursion to keep track of all parents found so far for a type.
 	 */
 	private Map<String,Set<Type>> addAllParents(String typename, Set<Type> existing){
 		
