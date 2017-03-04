@@ -25,13 +25,13 @@
   <target name="dist" depends="compile"
         description="Generate the distribution" >
     <!-- Put everything in ${build} into the jar file -->
-    <jar jarfile="jPDDL.jar" basedir="${build}"/>
+    <jar jarfile="${build}/jPDDL.jar" basedir="${build}"/>
   </target>
 
   <target name="clean"
         description="Clean up" >
     <!-- Delete the ${build} directory trees -->
     <delete dir="${build}"/>
-    <delete file="jPDDL.jar"/>
+    <delete file="${build}/jPDDL.jar"/>
   </target>
 </project>
