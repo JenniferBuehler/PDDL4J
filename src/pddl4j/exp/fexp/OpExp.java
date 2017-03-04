@@ -37,7 +37,6 @@ import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.TermID;
 import pddl4j.exp.type.Type;
-import pddl4j.exp.type.TypeSet;
 
 /**
  * This class implements an arithmetic function.
@@ -59,7 +58,7 @@ public abstract class OpExp extends FExp {
      * @throws NullPointerException if <code>op == null</code>.
      */
     protected OpExp(Op op) {
-        super(TermID.ARITHMETIC_FUNCTION, op.toString(), new TypeSet(Type.NUMBER));
+        super(TermID.ARITHMETIC_FUNCTION, op.toString(), Type.NUMBER);
         this.setOp(op);
     }
 

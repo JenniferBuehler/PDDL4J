@@ -148,8 +148,8 @@ public class WithinExp extends UnaryCondExp {
      * @return the hash code value of this "within" conditional expression.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.getArg().hashCode()
-                    + this.ts.hashCode();
+        return this.getExpID().hashCode() ^ this.getArg().hashCode()
+                    ^ this.ts.hashCode();
     }
     
     /**

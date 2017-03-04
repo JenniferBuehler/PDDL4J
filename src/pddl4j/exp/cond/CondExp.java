@@ -92,7 +92,7 @@ public abstract class CondExp extends AbstractExp {
      * @return a hash code value for the conditional expression.
      */
     public int hashCode() {
-        return super.hashCode() + this.condition.hashCode();
+        return super.hashCode() ^ this.condition.hashCode();
     }
 
 }

@@ -211,7 +211,7 @@ public final class DerivedPredicate extends AbstractExp {
      * @return a hash code value for the derived predicate.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.exp.hashCode();
+        return this.getExpID().hashCode() ^ this.exp.hashCode();
     }
 
     /**

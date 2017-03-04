@@ -38,7 +38,6 @@ import java.util.Set;
 import pddl4j.exp.AbstractExp;
 import pddl4j.exp.ExpID;
 import pddl4j.exp.type.Type;
-import pddl4j.exp.type.TypeSet;
 
 /** 
  * This abstract class implements the common part of all term used in PDDL language.
@@ -61,7 +60,7 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
     /**
      * The type of the term.
      */
-    private TypeSet type;
+    private Type type;
     
     /**
      * The term id of this term.
@@ -79,11 +78,12 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
      */
     protected AbstractTerm(TermID id, String image) {
         super(ExpID.TERM);
-        this.id = id;
+	throw new RuntimeException("At this stage, we should pass a type to the term always!");
+        /*this.id = id;
         this.setImage(image);
-        Map<String, Set<String>> type = new LinkedHashMap<String,Set<String>>();
-        type.put(Type.OBJECT_SYMBOL, new LinkedHashSet<String>());
-        this.setTypeSet(new TypeSet(new Type(Type.OBJECT_SYMBOL, type)));
+        Set<Type> pts = new LinkedHashSet<Type>();
+        pts.add(new Type(Type.OBJECT_SYMBOL, new LinkedHashSet<Type>()));
+        this.setType(new Type(Type.OBJECT_SYMBOL, pts));*/
     }
     
     /**
@@ -96,12 +96,13 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
      * @throws NullPointerException if <code>id == null</code> or
      *        <code>image == null</code> or <code>type == null</code>.
      */
-    protected AbstractTerm(TermID id, String image, TypeSet type) {
+    protected AbstractTerm(TermID id, String image, Type type) {
         super(ExpID.TERM);
         this.id = id;
         this.setImage(image);
-        this.setTypeSet(type);
+        this.setType(type);
     }
+
 
     /**
      * Returns the term id of this term.
@@ -132,26 +133,47 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
             throw new NullPointerException();
         this.image = image;
     }
-    
+ 
+   
     /**
      * Returns the type of the term.
      * 
      * @return the type of the term.
      */
-    public final TypeSet getTypeSet() {
+    public final Type getType() {
         return this.type;
     }
+
+    /*public final Type getOnlyType() {
+        return this.type.getOnlyType();
+    }*/
+
+    /**
+     * Sets a new type (the only one) to this term.
+     * @throws NullPointerException if <code>type == null</code>.
+     * @throws IllegalStateException if there is more than one type in the type set..
+     */
+    /*public void replaceOnlyType(Type t) {
+        if (this.type == null) 
+            throw new NullPointerException();
+	if (this.type.size()!=1)
+            throw new IllegalStateException("Can't replace only type because we have not exactly one: "+this.type.size());
+        this.type.clear();
+	this.type.add(t);
+    }*/
+
+ 
     
     /**
      * Sets a new type to this term.
      * 
-     * @param type the new type to set to this term.
+     * @param type the new type to this term.
      * @throws NullPointerException if <code>type == null</code>.
      */
-    protected void setTypeSet(TypeSet type) {
-        if (type == null) 
+    public void setType(Type t) {
+        if (t == null) 
             throw new NullPointerException();
-        this.type = type;
+        this.type = t;
     }
     
    /* /**
@@ -175,11 +197,12 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
      * Returns a deep copy of this term.
      * 
      * @return a deep copy of this term.
-     * @see java.lang.Cloneable
+     * @see java.util.Cloneable
      */
     public AbstractTerm clone() {
         AbstractTerm other = (AbstractTerm) super.clone();
-        other.type = this.type.clone();
+        other.type = (Type)this.type.clone();
+        other.id = this.id;
         return other;
     }
     
@@ -221,7 +244,7 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-        return super.hashCode() + this.id.hashCode() + this.getImage().hashCode();
+        return super.hashCode() ^ this.id.hashCode() ^ this.getImage().hashCode();
    }
     
     /**

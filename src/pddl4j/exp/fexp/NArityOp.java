@@ -33,7 +33,7 @@ package pddl4j.exp.fexp;
 import pddl4j.exp.term.Term;
 
 /**
- * This class implements an numeric function od arity n of the PDDL langage.
+ * This class implements an numeric function of arity n of the PDDL langage.
  * 
  * @author Damien Pellier
  * @version 1.0

@@ -30,6 +30,12 @@
 
 package pddl4j.exp;
 
+import pddl4j.ExpVisitor;
+import pddl4j.exp.term.Substitution;
+
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * This abstract class implements the common part of all PDDl expression.
  * 
@@ -51,7 +57,12 @@ public abstract class AbstractExp implements Exp {
     protected AbstractExp(ExpID id) {
         this.id = id;
     }
-    
+   
+
+    public Object accept(ExpVisitor v, Object obj){
+	throw new RuntimeException("Implement accept() method for this class! "+this.getClass().getName());
+    }
+ 
     /**
      * Returns the id of the expression.
      * 
@@ -61,7 +72,7 @@ public abstract class AbstractExp implements Exp {
     public final ExpID getExpID() {
        return this.id;
     }
-    
+
     /**
      * Returns <code>true</code> if this expression is equal to an other
      * object. This method returns <code>true</code> if the object is a not

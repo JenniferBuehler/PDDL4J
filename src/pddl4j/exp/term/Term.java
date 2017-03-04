@@ -33,7 +33,8 @@ package pddl4j.exp.term;
 import java.util.Map;
 
 import pddl4j.exp.Exp;
-import pddl4j.exp.type.TypeSet;
+import pddl4j.exp.type.Type;
+//import pddl4j.DeepCloneable;
 
 /**
  * This interface define all the method applicable to a PDDL term.
@@ -55,7 +56,15 @@ public interface Term extends Exp, Cloneable {
      * 
      * @return the type of this term.
      */
-    TypeSet  getTypeSet();
+    Type  getType();
+
+    /**
+     * Sets a new type to this term.
+     * 
+     * @param type the new type to this term.
+     * @throws NullPointerException if <code>type == null</code>.
+     */
+    void setType(Type t);
     
     /**
      * Returns a typed representation of this term.

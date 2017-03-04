@@ -35,7 +35,6 @@ import java.util.Map;
 
 import pddl4j.exp.term.TermID;
 import pddl4j.exp.type.Type;
-import pddl4j.exp.type.TypeSet;
 
 /**
  * This class implements a number in the PDDL langage.
@@ -49,6 +48,8 @@ public final class Number extends FExp implements Comparable<Number> {
      * The serial version id of this class.
      */
     private static final long serialVersionUID = 6081884046144807572L;
+    //private static final Number UNDEFINED = new Number(0.0);
+
 
     /**
      * Create a new number with a specific value.
@@ -56,7 +57,13 @@ public final class Number extends FExp implements Comparable<Number> {
      * @param value the value set to this number.
      */
     public Number(double value) {
-        super(TermID.NUMBER, String.valueOf(value), new TypeSet(Type.NUMBER));
+        super(TermID.NUMBER, String.valueOf(value), Type.NUMBER);
+    }
+
+
+    public Number(double value, Type _numberType) {
+        super(TermID.NUMBER, String.valueOf(value), _numberType);
+	if (!_numberType.isSubTypeOf(Type.NUMBER)) throw new RuntimeException("Type "+_numberType+" has to be subtype of number!");
     }
 
     /**
@@ -64,6 +71,17 @@ public final class Number extends FExp implements Comparable<Number> {
      */
     public Number() {
         this(0.0);
+    }
+
+    //Helper function, returns the common parent type of both numbers
+    public static Type getCompatibleType(Number n1, Number n2) {
+	Type numType1=n1.getType();
+	Type numType2=n2.getType();
+	Type resType=numType1;
+	if (resType.isSubTypeOf(numType2)) resType=numType2; 
+	else if (!numType2.isSubTypeOf(numType1)) resType=numType1.getCommonParentWith(numType2); 
+	if (resType==null) throw new RuntimeException("At least NUMBER must be common parent to "+n1+", "+n2);
+	return resType;
     }
 
     /**
@@ -141,6 +159,6 @@ public final class Number extends FExp implements Comparable<Number> {
      * @return a typed string representation of this number.
      */
     public String toTypedString() {
-        return this.getImage() + " - " + this.getTypeSet();
+        return this.getImage() + " - " + this.getType();
     }
 }

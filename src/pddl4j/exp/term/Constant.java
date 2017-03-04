@@ -32,10 +32,12 @@ package pddl4j.exp.term;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
 
+import pddl4j.exp.Exp;
 import pddl4j.exp.fexp.FExp;
 import pddl4j.exp.type.Type;
-import pddl4j.exp.type.TypeSet;
+import pddl4j.ExpVisitor;
 
 /**
  * This class implements a constant.
@@ -49,6 +51,9 @@ public final class Constant extends FExp implements Comparable<Constant> {
      * The serial version id of the class.
      */
     private static final long serialVersionUID = -8580834206648477520L;
+
+    public static final String UNDEFINED_SYMBOL = "undefined";
+    public static final Constant UNDEFINED = new Constant(UNDEFINED_SYMBOL,Type.OBJECT);
     
     /**
      * Creates a new constant of type object with a specified image.
@@ -60,17 +65,7 @@ public final class Constant extends FExp implements Comparable<Constant> {
         super(TermID.CONSTANT, image);
     }
     
-    /**
-     * Creates a new constant of type object with a specified image.
-     * 
-     * @param image the image of the constant.
-     * @param type the type of this constant.
-     * @throws NullPointerException if <code>image == null</code>.
-     */
-    public Constant(String image, Type type) {
-        super(TermID.CONSTANT, image, new TypeSet(type));
-    }
-    
+   
     /**
      * Creates a new constant with a specified image and type.
      * 
@@ -79,8 +74,13 @@ public final class Constant extends FExp implements Comparable<Constant> {
      * @throws NullPointerException if <code>image == null</code> or 
      *          <code>type == null</code>.
      */
-    public Constant(String image, TypeSet type) {
+    public Constant(String image, Type type) {
         super(TermID.CONSTANT, image, type);
+    }
+
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitConstant(this,obj);
     }
 
     /**
@@ -125,7 +125,7 @@ public final class Constant extends FExp implements Comparable<Constant> {
      * @return a typed string representation of this constant.
      */
     public String toTypedString() {
-        return this.getImage() + " - " + this.getTypeSet();
+        return this.getImage() + " - " + this.getType();
     }
     
     /**
@@ -149,8 +149,8 @@ public final class Constant extends FExp implements Comparable<Constant> {
      * @param type the type to set.
      * @throws NullPointerException if <code>type == null</code>.
      */
-    public void setTypeSet(TypeSet type) {
-        super.setTypeSet(type);
+    public void setType(Type type) {
+        super.setType(type);
     }
     
     /**

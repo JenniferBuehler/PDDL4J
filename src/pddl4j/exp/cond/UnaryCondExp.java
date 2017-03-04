@@ -194,7 +194,7 @@ public abstract class UnaryCondExp extends CondExp {
      * @return the hash code value of this unary conditional expression.
      */
     public int hashCode() {
-        return super.hashCode() + this.arg.hashCode();
+        return super.hashCode() ^ this.arg.hashCode();
     }
     
     /**

@@ -33,7 +33,9 @@ package pddl4j.exp.fexp;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.TermID;
 import pddl4j.exp.type.Type;
-import pddl4j.exp.type.TypeSet;
+
+import pddl4j.ExpVisitor;
+import java.util.Collection;
 
 /**
  * This class implements a function head of the PDDL langage.
@@ -56,21 +58,11 @@ public final class FHead extends FExp {
      * @throws NullPointerException if <code>functor == null</code> or
      *             <code>type == null</code>.
      */
-    public FHead(String functor, TypeSet type) {
+    public FHead(String functor, Type type) {
         super(TermID.FUNCTION, functor, type);
     }
     
-    /**
-     * Create an empty function head with a specific functor.
-     * 
-     * @param functor the function functor.
-     * @param type the type of this function head.
-     * @throws NullPointerException if <code>functor == null</code>
-     */
-    public FHead(String functor, Type type) {
-        super(TermID.FUNCTION, functor, new TypeSet(type));
-    } 
-    
+     
     /**
      * Adds a new argument to this function.
      * 
@@ -81,6 +73,14 @@ public final class FHead extends FExp {
      */
     public boolean add(Term arg) {
         return super.add(arg);
+    }
+
+    public boolean addAll(Collection<? extends Term> arg) {
+        return super.addAll(arg);
+    }
+
+    public void clearArgs() {
+        super.clearArgs();
     }
 
     /**
@@ -116,8 +116,8 @@ public final class FHead extends FExp {
      * @param type the type to set.
      * @throws NullPointerException if <code>type == null</code>.
      */
-    public void setTypeSet(TypeSet type) {
-        super.setTypeSet(type);
+    public void setType(Type type) {
+        super.setType(type);
     }
     
 

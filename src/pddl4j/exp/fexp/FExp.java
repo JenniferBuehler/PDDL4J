@@ -36,6 +36,8 @@ import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.Collection;
 
 import pddl4j.EvaluationException;
 import pddl4j.exp.term.AbstractTerm;
@@ -44,7 +46,9 @@ import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.TermID;
 import pddl4j.exp.term.Variable;
-import pddl4j.exp.type.TypeSet;
+import pddl4j.exp.type.Type;
+import pddl4j.exp.Exp;
+import pddl4j.ExpVisitor;
 
 /**
  * This class implements a function expression in the PDDL language.
@@ -86,11 +90,20 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
      * @throws NullPointerException if <code>id == null</code> or
      *             <code>functor == null</code> or <code>type == null</code>.
      */
-    protected FExp(TermID id, String functor, TypeSet type) {
+    protected FExp(TermID id, String functor, Type type) {
         super(id, functor, type);
         this.arguments = new ArrayList<Term>();
     }
-     
+
+    public ArrayList<Term> getArguments(){
+	return (ArrayList<Term>) this.arguments.clone();
+    }
+
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitFExp(this,obj);
+    }
+ 
     /**
      * Adds a new argument to this function.
      * 
@@ -102,6 +115,17 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
     protected boolean add(Term arg) {
         return this.arguments.add(arg);
     }
+
+    public boolean addAll(Collection<? extends Term> arg) {
+        return this.arguments.addAll(arg);
+    }
+
+    public void clearArgs() {
+        this.arguments.clear();
+    }
+
+
+
 
     /**
      * Returns the argument at the specified position in this function.
@@ -234,6 +258,8 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
         return this.arguments.iterator();
     }
 
+
+
     /**
      * Unify this term with an other specified term. Note, call unify does not modify
      * the parameters of this method. 
@@ -246,7 +272,6 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
      * @throws BindingException if the term to unify with this function is a
      *             function with the same symbol and the same arity and has an
      *             incompatible type, i.e.,
-     *             <code>!this.getTypeSet().getSubTypes().containsAll(term.getTypeSet().getSubTypes())</code>.      
      */
     public final Substitution unify(Term term) { 
        return this.unify(term, new Substitution()); 
@@ -265,18 +290,17 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
      * @throws BindingException if the term to unify with this function is a
      *             function with the same symbol and the same arity and has an
      *             incompatible type, i.e.,
-     *             <code>!this.getTypeSet().getSubTypes().containsAll(term.getTypeSet().getSubTypes())</code>.
      */
     public final Substitution unify(Term term, Substitution sigma) {
         if (term.getTermID().equals(TermID.VARIABLE)) {
             return term.unify(this, sigma);
         } else {
             FExp func = (FExp) term;
-            if (func.getImage().equals(this.getImage())
-                        && func.getArity() == this.getArity()) {
-                if (this.getTypeSet().getSubTypes().containsAll(
-                            func.getTypeSet().getSubTypes())) {
-                    Substitution theta = sigma.clone();
+            if (func.getImage().equals(this.getImage()) && (func.getArity() == this.getArity())) {
+		//System.out.println("Unifying "+this.toTypedString()+" other "+term.toTypedString());
+                //if (this.getType().getSubTypes().containsAll(func.getType().getSubTypes())) {
+                if (this.getType().isSubTypeOf(func.getType()) || func.getType().isSubTypeOf(this.getType())) {
+                    Substitution theta = sigma.shallowClone();
                     int i = 0;
                     boolean failure = false;
                     while (i < this.getArity() && !failure) {
@@ -338,7 +362,7 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
      * @return the hash code value of this function head.
      */
     public int hashCode() {
-        return super.hashCode() + this.arguments.hashCode();
+        return super.hashCode() ^ this.arguments.hashCode();
    }
 
     /**
@@ -386,7 +410,7 @@ public abstract class FExp extends AbstractTerm implements Iterable<Term> {
         }
         str.append(")");
         str.append(" - ");
-        str.append(this.getTypeSet().toString());
+        str.append(this.getType().toString());
         return str.toString();
     }
     

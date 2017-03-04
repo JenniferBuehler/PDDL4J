@@ -104,7 +104,7 @@ public final class BinaryMultiply extends BinaryOp {
                             + this.toString() + ": argument " + this.getArg2()
                             + " is not evaluable");
             }
-            return new Number(arg1.getValue() * arg2.getValue());
+            return new Number(arg1.getValue() * arg2.getValue(),Number.getCompatibleType(arg1,arg2));
         } catch (ArithmeticException e) {
             throw new EvaluationException("arithmetic function "
                                 + this.toString() + ": " + e.getMessage(), e);

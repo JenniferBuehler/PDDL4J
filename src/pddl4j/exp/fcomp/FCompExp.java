@@ -44,6 +44,7 @@ import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.TermID;
 import pddl4j.exp.term.Variable;
+import pddl4j.ExpVisitor;
 
 /**
  * This class implements a compared function.
@@ -84,6 +85,11 @@ public abstract class FCompExp extends AbstractExp {
         this.op = op;
         this.arg1 = arg1;
         this.arg2 = arg2;
+    }
+
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitCompExp(this,obj);
     }
 
     /**
@@ -239,7 +245,7 @@ public abstract class FCompExp extends AbstractExp {
     /**
      * Returns <code>true</code> if this compared expression is evaluable.
      * In the general case, an compared expression is evaluable if it is
-     * ground and its arguments are recursively either a number either a
+     * ground and its arguments are recursively either a number or a
      * arithmetic function. In the case of the equality, a compared expression
      * is also evaluable if the arguments of the expression are constant
      * terms.
@@ -294,8 +300,8 @@ public abstract class FCompExp extends AbstractExp {
      * @return the hash code value of this compared function.
      */
     public int hashCode() {
-        return super.hashCode() + this.getOp().hashCode()
-                    + this.arg1.hashCode() + this.arg2.hashCode();
+        return super.hashCode() ^ this.getOp().hashCode()
+                    ^ this.arg1.hashCode() ^ this.arg2.hashCode();
     }
     
     /**

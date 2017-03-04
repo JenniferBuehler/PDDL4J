@@ -108,7 +108,7 @@ public abstract class OverTimedExp extends TimedExp {
      * @return a hash code value for the over timed expression.
      */
     public int hashCode() {
-        return super.hashCode() + this.interval.hashCode();
+        return super.hashCode() ^ this.interval.hashCode();
     }
    
     /**

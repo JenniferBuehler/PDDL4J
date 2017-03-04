@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.Set;
 
 import pddl4j.exp.term.Term;
+import pddl4j.exp.term.Substitution;
+import pddl4j.exp.Exp;
+//import pddl4j.DeepCloneable;
 
 /**
  * This interface is implemented by all type of action defined in the PDDL
@@ -45,6 +48,21 @@ import pddl4j.exp.term.Term;
  * @version 1.0
  */
 public interface ActionDef extends Iterable<Term>, Serializable, Cloneable {
+
+
+    /**
+     * Substitutes all occurrences of the variables that occur in this
+     * action's parameters, conditions and effects
+     * and that are bound in the substitution by its binding term.
+     * 
+     * @param sigma the substitution.
+     * @return a substituted copy of this expression.
+     * @throws NullPointerException if <code>sigma == null</code>.
+     */
+    ActionDef apply(Substitution sigma);
+
+    //return true if it is a durative action
+    boolean isDurative(); 
     
     /**
      * Returns the action id of this action.
@@ -67,6 +85,7 @@ public interface ActionDef extends Iterable<Term>, Serializable, Cloneable {
      * @return the parameters of the action.
      */
     List<Term> getParameters();
+
     
     /**
      * Adds a parameter to this action.
@@ -178,7 +197,7 @@ public interface ActionDef extends Iterable<Term>, Serializable, Cloneable {
      * @return a deep copy of this expression.
      * @see java.lang.Cloneable
      */
-    ActionDef clone();
+    Object clone();
     
     /**
      * Returns a typed string of this action.

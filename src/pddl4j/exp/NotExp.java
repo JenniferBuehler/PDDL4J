@@ -33,10 +33,12 @@ package pddl4j.exp;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.Variable;
+import pddl4j.ExpVisitor;
 
 /**
  * This class is implemented by all negative expression in the PDDL language.
@@ -67,6 +69,11 @@ public class NotExp extends AbstractExp {
         if (exp == null)
             throw new NullPointerException();
         this.exp = exp;
+    }
+
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitNotExp(this,obj);
     }
 
     /**
@@ -117,6 +124,7 @@ public class NotExp extends AbstractExp {
             throw new NullPointerException();
         return new NotExp(this.exp.apply(sigma));
     }
+
 
     /**
      * Standardizes all occurrences of the variables that occur in this
@@ -184,7 +192,7 @@ public class NotExp extends AbstractExp {
      * @return a hash code value for the negative expression.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.exp.hashCode();
+        return this.getExpID().hashCode() ^ this.exp.hashCode();
     }
 
     /**

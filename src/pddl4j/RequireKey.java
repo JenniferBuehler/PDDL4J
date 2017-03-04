@@ -108,7 +108,18 @@ public enum RequireKey {
     /**
      * The PDDL :duration-inegalities requirement.
      */
-    DURATION_INEQUALITIES(":duration-inequalities");
+    DURATION_INEQUALITIES(":duration-inequalities"),
+
+    OBJECT_FLUENTS(":object-fluents"),
+    NUMERIC_FLUENTS(":numeric-fluents"),
+    ACTION_COSTS(":action-costs"),
+    /** 
+     * For durative actions, if this requirement is set, the "over all" statement
+     * refers to the time while the action is running ONLY, and NOT the start and end times
+     */
+    INTERVAL_SEPARATED(":interval-separated");
+
+
 
     /**
      * The image associate to the require key in the PDDL langage.

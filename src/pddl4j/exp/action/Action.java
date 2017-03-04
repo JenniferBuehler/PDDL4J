@@ -37,6 +37,7 @@ import java.util.Iterator;
 import pddl4j.exp.AndExp;
 import pddl4j.exp.Exp;
 import pddl4j.exp.term.Term;
+import pddl4j.exp.term.Substitution;
 
 /**
  * This class implements a strips action of the pddl language.
@@ -75,7 +76,34 @@ public class Action extends AbstractActionDef {
         this.precondition = new AndExp();
         this.effect = new AndExp();
     }
-    
+   
+    /*public int hashCode(){
+	return super.hashCode();// ^ precondition.hashCode() ^ effect.hashCode();
+    } 
+
+    public boolean equals(Object obj) {
+        if ((obj != null) && (obj instanceof Action)) {
+            Action other = (Action) obj;
+            return this.getName().equals(other.getName()) 
+			&& this.precondition.equals(other.precondition) 
+			&& this.effect.equals(other.effect);
+        }
+        return false;
+    }*/
+
+
+
+    public boolean isDurative(){
+	return false;
+    }
+   
+    public ActionDef apply(Substitution sigma){
+	Action copy=(Action)super.apply(sigma);
+	copy.precondition=copy.precondition.apply(sigma);
+	copy.effect=copy.effect.apply(sigma);
+	return copy;
+    }
+ 
     /**
      * Returns the precondition of the action. 
      * 
@@ -126,7 +154,7 @@ public class Action extends AbstractActionDef {
      */
     public Action standardize() {
         Map<String,String> images = new LinkedHashMap<String, String>();
-        Action other = this.clone();
+        Action other = (Action) this.clone();
         other.parameters.clear();
         for (Term param : this.parameters) {
             other.add(param.standardize(images));
@@ -177,7 +205,7 @@ public class Action extends AbstractActionDef {
      * @return a clone of this expression instance.
      * @see pddl4j.exp.Exp#clone()
      */
-    public Action clone() {
+    public Object clone() {
         Action other = (Action) super.clone();
         other.precondition = this.precondition.clone();
         other.effect = this.effect.clone();

@@ -38,6 +38,7 @@ import java.util.Set;
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.Variable;
+import pddl4j.ExpVisitor;
 
 /**
  * This class is implemented by all implication expression of the PDDL langage.
@@ -78,7 +79,12 @@ public class ImplyExp extends AbstractExp {
         this.head = head;
         this.body = body;
     }
-    
+   
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitImplyExp(this,obj);
+    }
+ 
     /**
      * Sets a new head to this implication expression.
      * 
@@ -220,8 +226,8 @@ public class ImplyExp extends AbstractExp {
      * @return a hash code value for the implication expression.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.head.hashCode()
-                    + this.body.hashCode();
+        return this.getExpID().hashCode() ^ this.head.hashCode()
+                    ^ this.body.hashCode();
     }
     
     /**

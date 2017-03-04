@@ -40,6 +40,7 @@ import pddl4j.exp.ExpID;
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.Variable;
+import pddl4j.ExpVisitor;
 
 /**
  * The abstract generic class implements the common methods of all timed
@@ -76,6 +77,12 @@ public abstract class TimedExp extends AbstractExp {
         this.id = id;
         this.exp = exp;
     }
+
+
+    public Object accept(ExpVisitor v, Object obj){
+	return exp.accept(v,obj);
+    }
+
 
     /**
      * Returns the timed expression id of this times expression.
@@ -207,7 +214,7 @@ public abstract class TimedExp extends AbstractExp {
      * @return a hash code value for the timed expression.
      */
     public int hashCode() {
-        return super.hashCode() + this.exp.hashCode();
+        return super.hashCode() ^ this.exp.hashCode();
     }
 
     /**

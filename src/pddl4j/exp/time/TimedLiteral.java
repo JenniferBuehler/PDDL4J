@@ -223,7 +223,7 @@ public class TimedLiteral extends TimedExp implements Literal {
      * @return a hash code value for the effect goal description.
      */
     public int hashCode() {
-        return super.hashCode() + this.ts.hashCode();
+        return super.hashCode() ^ this.ts.hashCode();
     }
 
     /**

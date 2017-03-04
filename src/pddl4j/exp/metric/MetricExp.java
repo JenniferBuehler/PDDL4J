@@ -203,7 +203,7 @@ public abstract class MetricExp extends AbstractExp {
      * @return a hash code value for the effect goal description.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.exp.hashCode();
+        return this.getExpID().hashCode() ^ this.exp.hashCode();
     }
     
     /**

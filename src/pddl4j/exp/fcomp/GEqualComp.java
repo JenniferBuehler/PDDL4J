@@ -156,7 +156,7 @@ public class GEqualComp extends FCompExp {
                 OpExp func = (OpExp) this.getArg2();
                 op2 = func.evaluate();
             } else {
-                op2 = (Number) this.getArg1();
+                op2 = (Number) this.getArg2();
             }
             return op1.getValue() >= op2.getValue();
         } else {

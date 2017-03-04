@@ -153,7 +153,7 @@ public class HoldAfterExp extends UnaryCondExp {
      * @return the hash code value of this "hold-after" conditional expression.
      */
     public int hashCode() {
-        return super.hashCode() + this.ts.hashCode();
+        return super.hashCode() ^ this.ts.hashCode();
     }
     
     /**

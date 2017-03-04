@@ -30,17 +30,22 @@
 
 package pddl4j.exp;
 
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.TermID;
 import pddl4j.exp.term.Variable;
+import pddl4j.exp.fexp.FExp;
+import pddl4j.ExpVisitor;
 
 /**
  * This class implements a atomic formula of the PDDL langage.
@@ -78,6 +83,21 @@ public class AtomicFormula extends AbstractExp implements Literal {
     }
 
     /**
+     * Copies the function name and arguments from function expression. 
+     */
+    public AtomicFormula(FExp exp) {
+        super(ExpID.ATOMIC_FORMULA);
+        this.predicate = exp.getImage();
+        this.arguments = exp.getArguments();
+    }
+
+
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitAtomicFormula(this,obj);
+    }
+
+    /**
      * Sets a new predicate to this atomic formula.
      * 
      * @param predicate the new predicate to set. The predicate must be a not
@@ -109,6 +129,18 @@ public class AtomicFormula extends AbstractExp implements Literal {
         return this.arguments.add(term);
     }
 
+    public final boolean addAll(Collection<? extends Term> terms) {
+        if (terms == null)
+            throw new NullPointerException();
+        return this.arguments.addAll(terms);
+    }
+
+
+    public final void clearTerms() {
+	this.arguments.clear();
+    }
+
+
     /**
      * Returns the arity of this atomic formula.
      * 
@@ -116,6 +148,14 @@ public class AtomicFormula extends AbstractExp implements Literal {
      */
     public final int getArity() {
         return this.arguments.size();
+    }
+    
+    private ArrayList<Term> getArguments() {
+	return arguments;
+    }
+
+    public Term getArg(int index){
+	return arguments.get(index);
     }
 
     /**
@@ -157,6 +197,7 @@ public class AtomicFormula extends AbstractExp implements Literal {
         return other;
     }
 
+
     /**
      * Matches this atomic formula with an other specified atomic formula. Two
      * atomic formulas match if they have the same predicate symbol and arity
@@ -194,12 +235,11 @@ public class AtomicFormula extends AbstractExp implements Literal {
      * @see pddl4j.exp.term.Term#unify(Term, Substitution)
      */
     public final Substitution match(AtomicFormula atom, Substitution sigma) {
-        if (this.predicate.equals(atom.predicate)
-                    && this.getArity() == atom.getArity()) {
-            Substitution theta = sigma.clone();
+        if ((this.getArity() == atom.getArity()) && this.predicate.equals(atom.predicate)) {
+            Substitution theta = sigma.shallowClone();
             int i = 0;
             boolean failure = false;
-            while (i < this.getArity() && !failure) {
+            while ((i < this.getArity()) && !failure) {
                 Term tthis = this.arguments.get(i);
                 Term tother = atom.arguments.get(i);
                 Substitution gamma = tthis.unify(tother, theta);
@@ -291,7 +331,7 @@ public class AtomicFormula extends AbstractExp implements Literal {
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-        return this.predicate.hashCode() + this.arguments.hashCode();
+        return this.predicate.hashCode() ^ this.arguments.hashCode();
     }
     
     /**

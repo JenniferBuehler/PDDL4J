@@ -33,10 +33,14 @@ package pddl4j.exp;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.Variable;
+import pddl4j.ExpVisitor;
+//import pddl4j.DeepCloneable;
 
 /**
  * This interface is implemented by all expression of the PDDL language.
@@ -52,7 +56,12 @@ public interface Exp extends Serializable, Cloneable {
      * @return the id of the expression.
      */
     ExpID getExpID();
-    
+
+    /**
+     * Accepts an ExpVisitor
+     */
+    Object accept(ExpVisitor v, Object obj);
+ 
     /**
      * Returns <code>true</code> if the expression is ground.
      * 
@@ -87,7 +96,8 @@ public interface Exp extends Serializable, Cloneable {
      * @return a string representation of the expression.
      */
     String toString();
-    
+
+ 
     /**
      * Returns <code>true</code> if a term occurs in this expression.
      * 
@@ -97,6 +107,7 @@ public interface Exp extends Serializable, Cloneable {
      * @throws NullPointerException if <code>term == null</code>.        
      */
     boolean occurs(Term term);
+
     
     /**
      * Substitutes all occurrences of the variables that occur in this
@@ -107,7 +118,8 @@ public interface Exp extends Serializable, Cloneable {
      * @throws NullPointerException if <code>sigma == null</code>.
      */
     Exp apply(Substitution sigma);
-       
+     
+    
     /**
      * Standardizes all occurrences of the variables that occur in this
      * expression. Remember that free variables are existentially quantified.
@@ -158,7 +170,7 @@ public interface Exp extends Serializable, Cloneable {
      * deeply copy.
      * 
      * @return a deep copy of this expression.
-     * @see java.lang.Cloneable
+     * @see java.util.Cloneable
      */
     Exp clone();
     
@@ -220,7 +232,7 @@ public interface Exp extends Serializable, Cloneable {
      * <li><code>(or (and A B) C)) => (and (or A C) (or B C))</code></li>
      * </ul>
      * 
-     * @return the disjunctive normal form of this expression.
+     * @return the conjunctive normal form of this expression.
      */
     Exp toConjunctiveNormalForm();
     

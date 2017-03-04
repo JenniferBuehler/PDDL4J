@@ -229,8 +229,8 @@ public class PrefExp extends AbstractExp {
      * @return a hash code value for the preference expression.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.name.hashCode()
-                    + this.exp.hashCode();
+        return this.getExpID().hashCode() ^ this.name.hashCode()
+                    ^ this.exp.hashCode();
     }
 
     /**

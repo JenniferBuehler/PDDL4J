@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import pddl4j.exp.term.Term;
+import pddl4j.exp.term.Substitution;
 
 /**
  * This class implements the common structures and method shares by all PDDL
@@ -73,6 +74,20 @@ public abstract class AbstractActionDef implements ActionDef {
         this.id = id;
         this.setName(name);
         this.parameters = new ArrayList<Term>();
+    }
+
+    public ActionDef apply(Substitution sigma) {
+        AbstractActionDef other = null;
+        try {
+            other = (AbstractActionDef) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        other.parameters = new ArrayList<Term>();
+        for (Term param : this.parameters) {
+            other.parameters.add(param.apply(sigma));
+        }
+        return other;        
     }
     
     /**
@@ -160,12 +175,12 @@ public abstract class AbstractActionDef implements ActionDef {
      * @see pddl4j.exp.Exp#isGround()
      */
     public boolean isGround() {
-        boolean gound = true;
+        boolean ground = true;
         Iterator<Term> i = this.parameters.iterator();
-        while (i.hasNext() && gound) {
-            gound = i.next().isGround();
+        while (i.hasNext() && ground) {
+            ground = i.next().isGround();
         }
-        return gound;
+        return ground;
     }
         
     /**
@@ -177,10 +192,10 @@ public abstract class AbstractActionDef implements ActionDef {
      * @return <code>true</code> if this action is equal to an other
      *         object; <code>false</code> otherwise.
      */
-    public final boolean equals(Object obj) {
-        if (obj != null && obj instanceof ActionDef) {
-            Action other = (Action) obj;
-            return this.getName().equals(other.getName());
+    public boolean equals(Object obj) {
+        if ((obj != null) && (obj instanceof AbstractActionDef)) {
+            AbstractActionDef other = (AbstractActionDef) obj;
+            return this.getName().equals(other.getName()) && this.parameters.equals(other.parameters);
         }
         return false;
     }
@@ -192,8 +207,12 @@ public abstract class AbstractActionDef implements ActionDef {
      * 
      * @return a hash code value for the strips action.
      */
-    public final int hashCode() {
-        return this.getName().hashCode();
+    public int hashCode() {
+	int hash=this.getName().hashCode();
+        for (Term param : this.parameters) {
+            hash=hash^param.hashCode();
+        }
+        return hash;
     }
 
     /**
@@ -202,7 +221,7 @@ public abstract class AbstractActionDef implements ActionDef {
      * @return a deep copy of this abstract action.
      * @see pddl4j.exp.AbstractExp#clone()
      */
-    public AbstractActionDef clone() {
+    public Object clone() {
         AbstractActionDef other = null;
         try {
             other = (AbstractActionDef) super.clone();

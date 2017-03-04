@@ -157,7 +157,7 @@ public class EqualComp extends FCompExp implements InitEl {
                 OpExp func = (OpExp) this.getArg2();
                 op2 = func.evaluate();
             } else {
-                op2 = (Number) this.getArg1();
+                op2 = (Number) this.getArg2();
             }
             return op1.equals(op2);
         } else if (this.getArg1().getTermID().equals(TermID.CONSTANT)

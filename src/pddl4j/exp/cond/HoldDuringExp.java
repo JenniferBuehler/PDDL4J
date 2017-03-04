@@ -187,7 +187,7 @@ public class HoldDuringExp extends UnaryCondExp {
      * @return the hash code value of this "hold-during" conditional expression.
      */
     public int hashCode() {
-        return super.hashCode() + this.lts.hashCode() + this.uts.hashCode();
+        return super.hashCode() ^ this.lts.hashCode() ^ this.uts.hashCode();
     }
     
     /**

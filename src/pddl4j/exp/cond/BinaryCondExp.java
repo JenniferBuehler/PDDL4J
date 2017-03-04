@@ -233,7 +233,7 @@ public abstract class BinaryCondExp extends CondExp {
      * @return the hash code value of this binary conditional expression.
      */
     public int hashCode() {
-        return super.hashCode() + this.arg1.hashCode() + this.arg2.hashCode();
+        return super.hashCode() ^ this.arg1.hashCode() ^ this.arg2.hashCode();
     }
 
     /**

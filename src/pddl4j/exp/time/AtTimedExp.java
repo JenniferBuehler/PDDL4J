@@ -104,7 +104,7 @@ public abstract class AtTimedExp extends TimedExp {
      * @return a hash code value for the at timed expression.
      */
     public int hashCode() {
-        return super.hashCode() + this.specifier.hashCode();
+        return super.hashCode() ^ this.specifier.hashCode();
     }
     
     /**

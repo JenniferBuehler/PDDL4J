@@ -37,14 +37,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Map.Entry;
+import java.util.Iterator;
+
+//import pddl4j.DeepCloneable;
 
 /**
  * This class implements a type.
  * 
- * @author Damien Pellier
- * @version 1.0
  */
-public final class Type implements Serializable {
+public class Type implements Serializable, Cloneable {
 
     /**
      * The serial version id of the class.
@@ -64,7 +65,8 @@ public final class Type implements Serializable {
     /**
      * The number primitive type.
      */
-    public static final Type NUMBER = new Type(Type.NUMBER_SYMBOL);
+    public static final Type OBJECT = new Type(Type.OBJECT_SYMBOL);
+    public static final Type NUMBER = new Type(Type.NUMBER_SYMBOL,asSet(OBJECT));
 
     /**
      * The image of this type.
@@ -72,17 +74,12 @@ public final class Type implements Serializable {
     private String image;
 
     /**
-     * The list of subtypes of this types.
-     */
-    private Map<String, Set<String>> subTypes;
-
-    /**
      * The list of super types of this types.
      */
-    private Map<String, Set<String>> superTypes;
+    private Set<Type> parentTypes;
 
     /**
-     * Creates a new type with a specific image and type hierachy. 
+     * Creates a new type with a specific image and parent types. 
      * 
      * @param image the image of the type.
      * @param hierarchy the type hierachy.
@@ -93,28 +90,11 @@ public final class Type implements Serializable {
      *             contain cycle and all types inherite from object except the
      *             primitive type number.
      */
-    public Type(String image, Map<String, Set<String>> hierarchy) {
-        if (image == null || hierarchy == null) 
+    public Type(String image, Set<Type> parents) {
+        if (image == null || parents == null) 
             throw new NullPointerException();
         this.image = image;
-        this.superTypes = new LinkedHashMap<String, Set<String>>();
-        this.subTypes = new LinkedHashMap<String, Set<String>>();        
-        if (!this.checkTypeHierarchy(hierarchy)) {
-            throw new TypingException(this);
-        }
-        for (Entry<String, Set<String>> e : hierarchy.entrySet()) {
-            String typeImg = e.getKey();
-            this.subTypes.put(e.getKey(), e.getValue());
-            for (String st : e.getValue()) {
-                Set<String> stSet = this.superTypes.get(st);
-                if (stSet == null) {
-                    stSet = new LinkedHashSet<String>();
-                    this.superTypes.put(st, stSet);
-                }
-                stSet.add(e.getKey());
-            }
-        }
-        this.superTypes.put(Type.OBJECT_SYMBOL, new LinkedHashSet<String>());
+        this.parentTypes = parents;
     }
     
     /**
@@ -125,14 +105,17 @@ public final class Type implements Serializable {
      * @param image the image of the type.
      * @throws NullPointerException if <code>image == null</code>.
      */
-    private Type(String image) {
+    protected Type(String image) {
         this.image = image;
-        this.superTypes = new LinkedHashMap<String, Set<String>>();
-        this.subTypes = new LinkedHashMap<String, Set<String>>();
-        this.subTypes.put(image, new LinkedHashSet<String>());
-        this.superTypes.put(image, new LinkedHashSet<String>());
+        this.parentTypes = new LinkedHashSet<Type>();
     }
-    
+   
+    public Object clone() {
+        Set<Type> parents = (Set<Type>) ((LinkedHashSet<Type>)parentTypes).clone();
+	return new Type(new String(this.image),parents);	
+    }
+
+ 
     /**
      * Returns the image of this type.
      * 
@@ -141,82 +124,68 @@ public final class Type implements Serializable {
     public String getImage() {
         return this.image;
     }
-
-    /**
-     * Returns <code>true</code> if this type is final, i.e., has no subtype.
-     * 
-     * @return <code>true</code> if this type is final, i.e., has no subtype;
-     *         <code>false</code> otherwise.
-     */
-    public boolean isFinal() {
-        return this.subTypes.get(this.image) == null
-                    || this.subTypes.get(this.image).isEmpty();
+    final protected void setImage(String s){
+	this.image=s;
     }
-    
-    /**
-     * Returns the set of sub-types of this type.
-     * 
-     * @return the set of sub-types of this type.
-     */
-    public Set<Type> getSuperTypes() {
-        Set<Type> types = new LinkedHashSet<Type>();
-        Set<String> images = this.superTypes.get(this.image);
-        for (String img : images) {
-            Type type = new Type(img);
-            type.subTypes = this.subTypes;
-            type.superTypes = this.superTypes;
-            types.add(type);
-        }
-        return types;
+
+    //returns true if this type is either the same, or a subtype
+    //of the other.
+    public boolean isSubTypeOf(Type other){
+	//it is necessary to use isSameType(), and containedIn(), instead of parentTypes.contains(), because
+	//"other" could be of another type which has to do a different check
+	return (other.isSameType(this)) || other.containedInParents(parentTypes);
+    }
+
+    //helper function for isSubTypeOf
+    protected boolean containedInParents(Set<Type> parentsSet){
+	return parentsSet.contains(this);	
     }
 
     /**
-     * Returns the set of super-types of this type.
-     * 
-     * @return the set of super-types of this type.
+     * Checks if the types are equal. This is not as equal(), as it might check for some other
+     * criteria which determine two types to be equal (by subclass implementations).
+     * In particular, it isdesigned for use as a helper function in isSubTypeOf().
      */
-    public Set<Type> getSubTypes() {
-        Set<Type> types = new LinkedHashSet<Type>();
-        Set<String> images = this.subTypes.get(this.image);
-        for (String img : images) {
-            Type type = new Type(img);
-            type.subTypes = this.subTypes;
-            type.superTypes = this.superTypes;
-            types.add(type);
+    protected boolean isSameType(Type other) {
+        if ((other != null) && other.getClass().equals(this.getClass())) {
+            return this.image.equals(other.image);
         }
-        return types;
+        return false;
     }
-    
-    /**
-     * Returns the set of all sub-types of this type.
-     * 
-     * @return the set of all sub-types of this type.
-     */
-    public Set<Type> getAllSuperTypes() {
-        Set<Type> superTypes = new LinkedHashSet<Type>();
-        Set<Type> types = this.getSuperTypes();
-        superTypes.addAll(types);
-        for (Type st : types) {
-            superTypes.addAll(st.getAllSuperTypes());
-        }
-        return superTypes;
+
+
+    //returns the type which is a common parent type of this type and the other,
+    //or null if there is no such common type. This function is useful if no
+    //type is a subtype of the other, but a common parent might exist.
+    public Type getCommonParentWith(Type other){
+	Set<Type> intersect = new LinkedHashSet(this.getParentTypes());
+        intersect.retainAll(other.getParentTypes());
+	if (intersect.isEmpty()) return null;
+	
+	Type ret=null;
+	//return the parent lowest in the hierarchy from the intersection
+	int maxHier=-1;
+	for (Type t: intersect){
+		if (t.parentTypes.size()>maxHier){
+			maxHier=t.parentTypes.size();
+			ret=t;
+		}
+	}
+	return ret;
     }
 
     /**
-     * Returns the set of all super-types of this type.
-     * 
-     * @return the set of all super-types of this type.
+     * @return the set of parent types of this type.
      */
-    public Set<Type> getAllSubTypes() {
-        Set<Type> subTypes = new LinkedHashSet<Type>();
-        Set<Type> types = this.getSubTypes();
-        subTypes.addAll(types);
-        for (Type st : types) {
-            subTypes.addAll(st.getAllSubTypes());
-        }
-        return subTypes;
+    public Set<Type> getParentTypes() {
+	return parentTypes;
     }
 
+    final protected void setParentTypes(Set<Type> p) {
+	parentTypes=p;
+    }   
+ 
+     
     /**
      * Returns <code>true</code> if this type is equals to an other object.
      * This method return <code>true</code> if the object is a not null
@@ -228,11 +197,10 @@ public final class Type implements Serializable {
      *         <code>false</code> otherwise.
      */
     public boolean equals(Object obj) {
-        if (obj != null && obj.getClass().equals(this.getClass())) {
-            Type other = (Type) obj;
-            return this.image.equals(other.image);
-        }
-        return false;
+        if ((obj != null) && obj.getClass().equals(this.getClass())) {
+		return isSameType((Type)obj);
+	}
+	return false;
     }
 
     /**
@@ -255,67 +223,31 @@ public final class Type implements Serializable {
     public String toString() {
         StringBuffer str = new StringBuffer();
         str.append(this.image);
-        /*str.append("[");
-        if (!this.subTypes.isEmpty()) {
-            Iterator<Type> i = this.subTypes.iterator();
-            str.append(i.next().image);
-            while (i.hasNext()) {
-                str.append(" " + i.next().image);
-            }
-        }
-        str.append("][");
-        if (!this.superTypes.isEmpty()) {
-            Iterator<Type> i = this.superTypes.iterator();
-            str.append(i.next().image);
-            while (i.hasNext()) {
-                str.append(" " + i.next().image);
-            }
-        }
-        str.append("]");*/
         return str.toString();
     }
     
-    
-    /**
-     * Checks the consistance of the type hierarchy. A type hierarchy is
-     * consistance if the hierarchy does not contain cycle and all types
-     * inherite from object except the primitive type number.
-     * 
-     * @param hierarchy the type hierarchy.
-     * @return <code>true</code> if the type hierarchy is consistant;
-     *         <code>false</code> otherwise.
-     */
-    private boolean checkTypeHierarchy(Map<String, Set<String>> hierarchy) {
-        Set<String> explored = new LinkedHashSet<String>();
-        if (hierarchy.containsKey(Type.OBJECT_SYMBOL)) {
-            Stack<String> stack = new Stack<String>();
-            stack.push(Type.OBJECT_SYMBOL);
-            Set<String> prefix = new LinkedHashSet<String>();
-            boolean consistant = true;
-            while (!stack.isEmpty() && consistant) {
-                String type = stack.pop();
-                explored.add(type);
-                Set<String> children = hierarchy.get(type);
-                if (children.isEmpty()) {
-                    prefix.remove(type);
-                } else {
-                    consistant = prefix.add(type);
-                    if (!consistant) {
-                    }
-                    for (String child : children) {
-                        stack.push(child);
 
-                    }
-                }
+     public String toDetailedString() {
+        StringBuffer str = new StringBuffer();
+        str.append(this.image);
+        str.append("[");
+        if (!this.parentTypes.isEmpty()) {
+            Iterator<Type> i = this.parentTypes.iterator();
+            str.append(i.next().image);
+            while (i.hasNext()) {
+                str.append(" " + i.next().image);
             }
-            Set<String> types = new LinkedHashSet<String>(hierarchy.keySet());
-            types.removeAll(explored);
-            return consistant
-                        && (types.isEmpty() || (types.size() == 1 && 
-                                    types.contains(Type.NUMBER_SYMBOL)));
         }
-        return false;
+        str.append("]");
+        return str.toString();
     }
-        
-    
+
+ 
+    private static Set<Type> asSet(Type t){
+	Set<Type> ret=new LinkedHashSet<Type>();
+	ret.add(t);
+	return ret;
+    }
+   
+   
 }

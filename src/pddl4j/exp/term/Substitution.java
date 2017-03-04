@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import pddl4j.exp.term.Substitution.Binding;
+//import pddl4j.DeepCloneable;
 
 
 /**
@@ -64,7 +65,17 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
     public Substitution() {
         this.binding = new LinkedHashMap<Variable, Term>();
     }
-    
+   
+
+    /**
+     * removes from this substitution all entries which have the same key as the substitutions in s.
+     */
+    public void subtractAll(Substitution s) {
+        for (Map.Entry<Variable, Term> e : s.binding.entrySet()) {
+            removeBinding(e.getKey());
+        }
+    }
+ 
     /**
      * Bind a specified variable to an other term in this substitution. If the
      * substitution previously contained a mapping term for the variable, the
@@ -79,13 +90,23 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
     public Term bind(final Variable var, final Term term) {
         if (var == null || term == null) 
             throw new NullPointerException();
-        /*if (!var.getTypeSet().getSubTypes().containsAll(term.getTypeSet().getSubTypes())) {
-            throw new BindingException("\"" + var.toTypedString() + "\" with \"" + term.toTypedString() + "\"");
-        }*/
+        //if (!var.getType().getSubTypes().containsAll(term.getType().getSubTypes())) {
+        if (!term.getType().isSubTypeOf(var.getType())) {
+            throw new BindingException("[\"" + var.toTypedString() + "\" = \"" + term.toTypedString() + "\"]");
+        }
         Term oldBinding = this.binding.get(var);
         this.binding.put(var, term);
         return oldBinding;
     }
+
+    public boolean removeBinding(final Variable var) {
+        if (var == null) 
+            throw new NullPointerException();
+        Term oldBinding = this.binding.remove(var);
+	if (oldBinding==null) return false;
+	return true;
+    }
+
     
     /**
      * Returns <code>true</code> if a specified variable occurs in this
@@ -132,7 +153,7 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
      * 
      * @return a deep copy of the subtitution.
      */
-    public Substitution clone() {
+    public Substitution deepClone() {
         try {
             Substitution other = (Substitution) super.clone();
             other.binding = new LinkedHashMap<Variable, Term>();
@@ -144,6 +165,17 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
             throw new Error();
         }
     }
+    public Substitution shallowClone() {
+        try {
+            Substitution other = (Substitution) super.clone();
+            other.binding = new LinkedHashMap<Variable, Term>();
+	    other.binding.putAll(this.binding);
+            return other;
+        } catch (CloneNotSupportedException e) {
+            throw new Error();
+        }
+    }
+
     
     /**
      * Returns a string representation of the substitution.
@@ -178,14 +210,14 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
         if (!this.binding.isEmpty()) {
             Iterator<Map.Entry<Variable, Term>> i = this.binding.entrySet().iterator();
             Map.Entry<Variable, Term> e = i.next();
-            str.append(e.getKey() + ":" + e.getKey().getTypeSet() + "/"
+            str.append(e.getKey() + ":" + e.getKey().getType() + "/"
                             + e.getValue().toString() + ":"
-                            + e.getValue().getTypeSet());
+                            + e.getValue().getType());
             while (i.hasNext()) {
                 e = i.next();
-                str.append(", " + e.getKey() + ":" + e.getKey().getTypeSet() + "/"
+                str.append(", " + e.getKey() + ":" + e.getKey().getType() + "/"
                             + e.getValue().toString() + ":"
-                            + e.getValue().getTypeSet());
+                            + e.getValue().getType());
             }
         } 
         str.append("]");
@@ -214,6 +246,20 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
             bindings.add(new Binding(e.getKey(), e.getValue()));
         }
         return bindings.iterator();
+    }
+
+    // XXX Had to add this method to allow for checking double Substitution entries in the map!!
+    public int hashCode() {
+            return this.binding.hashCode();
+    }
+
+
+    public boolean equals(Object obj) {
+        if (obj != null && obj.getClass().equals(this.getClass())) {
+	    Substitution otherSub=(Substitution)obj;
+            if (binding.equals(otherSub.binding)) return true;
+        }
+	return false;
     }
     
     /**
@@ -294,7 +340,7 @@ public final class Substitution implements Serializable, Cloneable, Iterable<Bin
          * @return the hash code value this binding.
          */
         public int hashCode() {
-            return this.var.hashCode() + this.term.hashCode();
+            return this.var.hashCode() ^ this.term.hashCode();
         }
         
         /**

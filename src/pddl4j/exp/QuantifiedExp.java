@@ -35,10 +35,12 @@ import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collection;
 
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.Variable;
+import pddl4j.ExpVisitor;
 
 /**
  * This abstract class is extended by all quantified expression.
@@ -94,6 +96,11 @@ public abstract class QuantifiedExp extends AbstractExp implements
         this(id, new LinkedHashSet<Variable>(), new AndExp());
     }
 
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitQuantifiedExp(this,obj);
+    }
+
     /**
      * Adds a new quantified variable to this quantified expression.
      * 
@@ -103,6 +110,17 @@ public abstract class QuantifiedExp extends AbstractExp implements
      */
     public boolean add(Variable var) {
         return this.vars.add(var);
+    }
+    
+    public boolean add(Collection<? extends Variable> var) {
+        return this.vars.addAll(var);
+    }
+
+    /**
+     * removes all variables
+     */
+    public void clearVariables() {
+        this.vars.clear();
     }
 
     /**
@@ -122,6 +140,10 @@ public abstract class QuantifiedExp extends AbstractExp implements
      */
     public final Exp getExp() {
         return this.exp;
+    }
+    
+    public final Set<Variable> getVars() {
+        return this.vars;
     }
 
     /**
@@ -153,8 +175,8 @@ public abstract class QuantifiedExp extends AbstractExp implements
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.vars.hashCode()
-                    + this.exp.hashCode();
+        return this.getExpID().hashCode() ^ this.vars.hashCode()
+                    ^ this.exp.hashCode();
     }
 
     /**
@@ -175,7 +197,8 @@ public abstract class QuantifiedExp extends AbstractExp implements
      * expression.
      * 
      * @param sigma the substitution.
-     * @return a substituted copy of this expression if all bound variables are not instantiated; the
+     * @return a substituted copy of this expression.
+     * XXX change: old was additionally that substituted copy only returned if all bound variables are not instantiated; the
      *         quantified copy expression otherwise.
      * @throws NullPointerException if <code>sigma == null</code>.
      */
@@ -184,14 +207,17 @@ public abstract class QuantifiedExp extends AbstractExp implements
             throw new NullPointerException();
         QuantifiedExp other = this.clone();
         other.exp = this.exp.apply(sigma);
-        Iterator<Variable> i = other.vars.iterator();
+        return other;
+	/*
+	Iterator<Variable> i = other.vars.iterator();
         while (i.hasNext()) {
             Variable var = i.next();
             if (!other.exp.occurs(var)) {
                 i.remove();
             }
         }
-        return other.vars.isEmpty() ? other.exp : this;
+	//System.out.println("This :"+this+" - other "+other);
+        return other.vars.isEmpty() ? other.exp : this;*/
     }
 
     /**

@@ -35,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import pddl4j.ExpVisitor;
 import pddl4j.exp.AbstractExp;
 import pddl4j.exp.ExpID;
 import pddl4j.exp.term.Substitution;
@@ -81,6 +82,11 @@ public abstract class AssignOpExp extends AbstractExp {
         this.op = op;
         this.arg1 = arg1;
         this.arg2 = arg2;
+    }
+
+
+    public Object accept(ExpVisitor v, Object obj){
+    	return v.visitAssignOpExp(this,obj);
     }
 
     /**
@@ -245,8 +251,8 @@ public abstract class AssignOpExp extends AbstractExp {
      * @return the hash code value of this "assign" operation.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.op.hashCode()
-                    + this.arg1.hashCode() + this.arg2.hashCode();
+        return this.getExpID().hashCode() ^ this.op.hashCode()
+                    ^ this.arg1.hashCode() ^ this.arg2.hashCode();
     }
 
     /**

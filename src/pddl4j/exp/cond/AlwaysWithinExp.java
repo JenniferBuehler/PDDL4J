@@ -156,8 +156,8 @@ public class AlwaysWithinExp extends BinaryCondExp {
      *         expression.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.getArg1().hashCode()
-                    + this.getArg2().hashCode() + this.ts.hashCode();
+        return this.getExpID().hashCode() ^ this.getArg1().hashCode()
+                    ^ this.getArg2().hashCode() ^ this.ts.hashCode();
     }
 
     /**

@@ -34,9 +34,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 import pddl4j.exp.type.Type;
-import pddl4j.exp.type.TypeSet;
+import pddl4j.exp.Exp;
+import pddl4j.ExpVisitor;
 
 /**
  * This class implements a variable.
@@ -50,6 +53,32 @@ public class Variable extends AbstractTerm {
      * The default class version id.
      */
     private static final long serialVersionUID = -6404872183241547003L;
+
+    /**
+     * The timed variable symbol.
+     */
+    public static final String DURATIVE_VARIABLE = "?duration";
+    public static final Variable DURATIVE_VARIABLE_INST = new Variable(DURATIVE_VARIABLE,Type.NUMBER);
+    
+    /**
+     * The continus variable symbol.
+     */
+    public static final String CONTINOUS_VARIABLE = "#t";
+    public static final Variable CONTINOUS_VARIABLE_INST = new Variable(CONTINOUS_VARIABLE,Type.NUMBER);
+    
+    public static final String TIMESTEP_VARIABLE = "#ts";
+    public static final Variable TIMESTEP_VARIABLE_INST = new Variable(TIMESTEP_VARIABLE,Type.NUMBER);
+    
+    /**
+     * The metric variable symbol.
+     */
+    public static final String TOTAL_TIME = "?total-time";
+    
+    /**
+     * The violated preference variable symbol.
+     */
+    public static final String VIOLATED_PREF_VARIABLE = "?violated-pref-";
+
      
     /**
      * Creates a new variable of type object with a specified image.
@@ -58,20 +87,10 @@ public class Variable extends AbstractTerm {
      * @throws NullPointerException if <code>image == null</code>.
      */
     public Variable(String image) {
-        super(TermID.VARIABLE, "?" + image);
+        super(TermID.VARIABLE, image);
     }
     
-    /**
-     * Creates a new variable of type object with a specified image.
-     * 
-     * @param image the image of the variable.
-     * @param type the type of the variable.
-     * @throws NullPointerException if <code>image == null</code>.
-     */
-    public Variable(String image, Type type) {
-        super(TermID.VARIABLE, "?" + image, new TypeSet(type));
-    }
-    
+   
     /**
      * Creates a new variable with a specified image and type.
      * 
@@ -80,14 +99,16 @@ public class Variable extends AbstractTerm {
      * @throws NullPointerException if <code>image == null</code> or
      *        <code>type == null</code>.
      */
-    public Variable(String image, TypeSet type) {
-        super(TermID.VARIABLE, "?" + image, type);
+    public Variable(String image, Type type) {
+        super(TermID.VARIABLE, image, type);
     }
-    
+
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitVariable(this,obj);
+    }
+   
     /**
-     * Returns the binding term to this variable in the specified substitution
-     * or this variable is the variable is not bind the substitution.
-     * 
      * @param sigma the substitution.
      * @return the substituted term or a copy of this variable if there is no
      *         binding term for this variable in the substitution.
@@ -106,8 +127,8 @@ public class Variable extends AbstractTerm {
      * @param type the type to set.
      * @throws NullPointerException if <code>type == null</code>.
      */
-    public void setTypeSet(TypeSet type) {
-        super.setTypeSet(type);
+    public void setType(Type type) {
+        super.setType(type);
     }
     
     /**
@@ -135,7 +156,9 @@ public class Variable extends AbstractTerm {
     public boolean isGround() {
         return false;
     }
-    
+
+  
+ 
     /**
      * Unify this variable with an other specified term. Note, called unify does
      * not modify the parameters of this method.
@@ -146,14 +169,15 @@ public class Variable extends AbstractTerm {
      *         binding constraints allows to unify the two terms.
      * @throws BindingException if the term to unify with this variable is a
      *             variable with the same symbol as this variable and has an
-     *             incompatible type, i.e.,
-     *             <code>!this.getTypeSet().getSubTypes().containsAll(term.getTypeSet().getSubTypes())</code>.
+     *             incompatible type
      * @see pddl4j.exp.term.Term#unify(Term, Substitution)
      */
     public Substitution unify(Term term) {
         return this.unify(term, new Substitution());
     }
-    
+   
+
+
     /**
      * Unify this variable with an other specified term by taking into account a
      * specified set of binding constraints. Note, called unify does not modify
@@ -166,19 +190,31 @@ public class Variable extends AbstractTerm {
      *         binding constraints allows to unify the two terms.
      * @throws BindingException if the term to unify with this variable is a
      *             variable with the same symbol as this variable and has an
-     *             incompatible type, i.e.,
-     *             <code>!this.getTypeSet().getSubTypes().containsAll(term.getTypeSet().getSubTypes())</code>.
+     *             incompatible type
      */
     public Substitution unify(final Term term, final Substitution sigma) {
-        Substitution theta = sigma.clone();
+        Substitution theta = sigma.shallowClone();
         Term binding = theta.getBinding(this);
         if (binding != null) {
-            return binding.unify(term, sigma);
+            //System.out.println(" Exist Bind "+term.toTypedString()+" and "+this.toTypedString()+". Binding: "+binding.toTypedString());
+	    //see if existing binding is compatible!
+       	     Type thisType=getType();
+	     Type termType=term.getType();
+	     Type bindingType=binding.getType();
+            //if ( binding.getType().equals(term.getType()) || term.getType().isSubTypeOf(binding.getType())) {
+	     if ( bindingType.equals(termType) || termType.isSubTypeOf(bindingType) || bindingType.isSubTypeOf(termType)) {
+			//XXX the uncommented statement was the first correct one, but there were problems unifying two variables
+			//of same type (both unbound still) for an existing binding to a more specific type... (e.g. (?v1 -tBase) with (?v2 - tBase) and a binding to ?v1 - tSpecific)
+			return binding.unify(term, sigma);
+	    }
+	    /*else{
+		System.out.println("Not compatible");
+	    }*/
         } else {
             if (term.getTermID().equals(TermID.VARIABLE)) {
+		//we have another variable to bind with 
                 if (term.getImage().equals(this.getImage())) {
-                    if (this.getTypeSet().getSubTypes().containsAll(
-                                term.getTypeSet().getSubTypes())) {
+                    if (this.getType().equals(term.getType())) { //XXX maybe it's enough to check for common parent here?
                         return theta;
                     } else {
                         throw new BindingException("cannot bind "
@@ -187,19 +223,21 @@ public class Variable extends AbstractTerm {
                                     + ": imcompatible type");
                     }
                 } else {
-                    TypeSet infinum = this.getTypeSet().infimum(
-                                term.getTypeSet());
-                    if (!infinum.isEmpty()) {
+		    //System.out.println("Bind "+term+" and "+this);
+		    //bin with a variable with a different name. Find a common parent type, and if there is one,
+		    //bind the term with this type.
+		    Type commonParent=this.getType().getCommonParentWith(term.getType());
+                    if (commonParent!=null) {
                         Variable var = (Variable) term.clone();
-                        var.setTypeSet(infinum);
+                        var.setType(commonParent);
                         theta.bind(this, var);
                         return theta;
-                    }
+                    } //if the intersection set is empty, we can't unify!
                 }
             } else {
+		//System.out.println(" ???? Bind "+term.toTypedString()+" and "+this.toTypedString());
                 if (!term.occurs(this)) {
-                    if (this.getTypeSet().getSubTypes().containsAll(
-                                term.getTypeSet().getSubTypes())) {
+                    if (term.getType().isSubTypeOf(this.getType())){
                         theta.bind(this, term);
                         return theta;
                     }
@@ -331,6 +369,7 @@ public class Variable extends AbstractTerm {
      */
     public String toString() {
         return this.getImage();
+        //return toTypedString();
     }
     
     /**
@@ -339,26 +378,7 @@ public class Variable extends AbstractTerm {
      * @return typed string representation of this variable.
      */
     public final String toTypedString() {
-        return this.getImage() + " - " + this.getTypeSet().toString();
+        return this.getImage() + " - " + this.getType().toString();
     }
     
-    /**
-     * The timed variable symbol.
-     */
-    public static final String DURATIVE_VARIABLE = "duration";
-    
-    /**
-     * The continus variable symbol.
-     */
-    public static final String CONTINOUS_VARIABLE = "#t";
-    
-    /**
-     * The metric variable symbol.
-     */
-    public static final String TOTAL_TIME = "?total-time";
-    
-    /**
-     * The violated preference variable symbol.
-     */
-    public static final String VIOLATED_PREF_VARIABLE = "?violated-pref-";
 }

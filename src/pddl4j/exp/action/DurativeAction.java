@@ -35,7 +35,14 @@ import java.util.LinkedHashMap;
 import java.util.Iterator;
 
 import pddl4j.exp.Exp;
+import pddl4j.exp.ExpID;
+import pddl4j.exp.ListExp;
 import pddl4j.exp.term.Term;
+import pddl4j.exp.term.Substitution;
+import pddl4j.exp.time.TimedExp;
+import pddl4j.exp.time.AtStartTimedExp;
+import pddl4j.exp.time.AtEndTimedExp;
+import pddl4j.exp.time.OverTimedExp;
 
 /**
  * This class implements a durative action of the PDDl language.
@@ -75,7 +82,37 @@ public class DurativeAction extends AbstractActionDef {
     public DurativeAction(String name) {
         super(ActionID.DURATIVE_ACTION, name);   
     }
-    
+
+
+   /*
+    public int hashCode(){
+	return super.hashCode();// ^ constraint.hashCode() ^ condition.hashCode() ^ effect.hashCode();
+    } 
+
+    public boolean equals(Object obj) {
+        if ((obj != null) && (obj instanceof DurativeAction)) {
+            DurativeAction other = (DurativeAction) obj;
+            return this.getName().equals(other.getName()) 
+			&& this.condition.equals(other.condition) 
+			&& this.effect.equals(other.effect)
+			&& this.constraint.equals(other.constraint);
+        }
+        return false;
+    }*/
+
+
+    public boolean isDurative(){ 
+	return true;
+    }
+   
+    public ActionDef apply(Substitution sigma){
+	DurativeAction copy=(DurativeAction)super.apply(sigma);
+	copy.condition=condition.apply(sigma);
+	copy.effect=effect.apply(sigma);
+	copy.constraint=constraint.apply(sigma);
+	return copy;
+    }
+ 
     /**
      * Returns the duration constraint of the durative action. 
      * 
@@ -147,7 +184,7 @@ public class DurativeAction extends AbstractActionDef {
      */
     public DurativeAction standardize() {
         Map<String,String> images = new LinkedHashMap<String, String>();
-        DurativeAction other = this.clone();
+        DurativeAction other = (DurativeAction) this.clone();
         other.parameters.clear();
         for (Term param : this.parameters) {
             other.add(param.standardize(images));
@@ -193,9 +230,10 @@ public class DurativeAction extends AbstractActionDef {
      * @see pddl4j.exp.Exp#isGround()
      */
     public boolean isGround() {
-        return super.isGround() && this.constraint.isGround()
-                    && this.condition.isGround()
-                    && this.effect.isGround();
+	 return super.isGround() 
+		&& this.constraint.isGround()
+		&& this.condition.isGround()
+		&& this.effect.isGround();
     }
     
     /**
@@ -204,7 +242,7 @@ public class DurativeAction extends AbstractActionDef {
      * @return a clone of this expression instance.
      * @see pddl4j.exp.Exp#clone()
      */
-    public DurativeAction clone() {
+    public Object clone() {
         DurativeAction other = (DurativeAction) super.clone();
         other.constraint = this.constraint.clone();
         other.condition = this.condition.clone();
@@ -231,12 +269,18 @@ public class DurativeAction extends AbstractActionDef {
             }
         }
         str.append(")");
-        str.append("\n:duration ");
-        str.append(this.constraint.toString());
-        str.append("\n:condition ");
-        str.append(this.condition.toString());
-        str.append("\n:effect ");
-        str.append(this.effect.toString());
+        if (this.constraint!=null) {
+		str.append("\n:duration ");
+	        str.append(this.constraint.toString());
+	}
+	if (this.condition!=null) {
+	        str.append("\n:condition ");
+       		str.append(this.condition.toString());
+	}
+        if (this.effect != null) {
+		str.append("\n:effect ");
+        	str.append(this.effect.toString());
+	}
         str.append(")");
         return str.toString();
     }
@@ -269,4 +313,248 @@ public class DurativeAction extends AbstractActionDef {
         str.append(")");
         return str.toString();
     }
+
+ 
+    //returns the condition c only if it is valid at start.
+    //works only if e is not a list expression
+    private Exp getStartExp(Exp c){
+	if (c.getExpID()!=ExpID.TIMED_EXP) return c; //assume if there's no tag, it is always valid! //throw new RuntimeException("Timed expressions expected! "+c);
+	if (c instanceof AtStartTimedExp) return ((TimedExp)c).getExp();
+	return null;
+    } 
+
+    //returns the condition c only if it is valid during the action.
+    //works only if e is not a list expression
+    private Exp getOverExp(Exp c){
+	if (c.getExpID()!=ExpID.TIMED_EXP) return c; //assume if there's no tag, it is always valid! //throw new RuntimeException("Timed expressions expected! "+c);
+	if (c instanceof OverTimedExp) return ((TimedExp)c).getExp();
+	return null;
+    } 
+
+    //returns the condition c only if it is valid at start, or during the action.
+    //works only if e is not a list expression
+    private Exp getStartOrOverExp(Exp c){
+	if (c.getExpID()!=ExpID.TIMED_EXP) return c; //assume if there's no tag, it is always valid! //throw new RuntimeException("Timed expressions expected! "+c);
+	if ((c instanceof OverTimedExp) || (c instanceof AtStartTimedExp)) return ((TimedExp)c).getExp();
+	return null;
+    } 
+
+    //returns the condition c only if it is valid at start, or during the action.
+    //works only if e is not a list expression
+    private Exp getEndOrOverExp(Exp c){
+	if (c.getExpID()!=ExpID.TIMED_EXP) return c; //assume if there's no tag, it is always valid! //throw new RuntimeException("Timed expressions expected! "+c);
+	if ((c instanceof OverTimedExp) || (c instanceof AtEndTimedExp)) return ((TimedExp)c).getExp();
+	return null;
+    } 
+
+
+
+
+    //returns the condition c only if it is valid at end.
+    //works only if e is not a list expression
+    private Exp getEndExp(Exp c){
+	if (c.getExpID()!=ExpID.TIMED_EXP) return c; //assume if there's no tag, it is always valid! //throw new RuntimeException("Timed expressions expected! "+c);
+	if (c instanceof AtEndTimedExp) return ((TimedExp)c).getExp();
+	return null;
+    } 
+
+
+    public Exp getStartAndOverConditions(){
+	//Preconditions will be actions which occur only at start
+	if (condition instanceof ListExp){ //we have a list expression
+		ListExp _cond=(ListExp) condition;
+		ListExp cond=_cond.clone();
+		cond.clearElems();
+		for (Exp c: _cond){
+			Exp sub=getStartOrOverExp(c);
+			if (sub!=null) cond.add(sub);
+		}
+		return cond;
+	}
+	//it is a simple element only
+	Exp c=getStartOrOverExp(condition);
+	if (c==null) return null;
+	return c;
+    }
+
+
+
+
+    public Exp getStartCondition(){
+	//Preconditions will be actions which occur only at start
+	if (condition instanceof ListExp){ //we have a list expression
+		ListExp _cond=(ListExp) condition;
+		ListExp cond=_cond.clone();
+		cond.clearElems();
+		for (Exp c: _cond){
+			Exp sub=getStartExp(c);
+			if (sub!=null) cond.add(sub);
+		}
+		return cond;
+	}
+	//it is a simple element only
+	Exp c=getStartExp(condition);
+	if (c==null) return null;
+	return c;
+    }
+
+    public Exp getOverCondition(){
+	//Preconditions will be actions which occur only at start
+	if (condition instanceof ListExp){ //we have a list expression
+		ListExp _cond=(ListExp) condition;
+		ListExp cond=_cond.clone();
+		cond.clearElems();
+		for (Exp c: _cond){
+			Exp sub=getOverExp(c);
+			if (sub!=null) cond.add(sub);
+		}
+		return cond;
+	}
+	//it is a simple element only
+	Exp c=getOverExp(condition);
+	if (c==null) return null;
+	return c;
+    }
+
+
+    public Exp getStartAndOverCondition(){
+	//Preconditions will be actions which occur only at start
+	if (condition instanceof ListExp){ //we have a list expression
+		ListExp _cond=(ListExp) condition;
+		ListExp cond=_cond.clone();
+		cond.clearElems();
+		for (Exp c: _cond){
+			Exp sub=getStartOrOverExp(c);
+			if (sub!=null) cond.add(sub);
+		}
+		return cond;
+	}
+	//it is a simple element only
+	Exp c=getStartOrOverExp(condition);
+	if (c==null) return null;
+	return c;
+    }
+
+    public Exp getEndAndOverCondition(){
+	//Preconditions will be actions which occur only at start
+	if (condition instanceof ListExp){ //we have a list expression
+		ListExp _cond=(ListExp) condition;
+		ListExp cond=_cond.clone();
+		cond.clearElems();
+		for (Exp c: _cond){
+			Exp sub=getEndOrOverExp(c);
+			if (sub!=null) cond.add(sub);
+		}
+		return cond;
+	}
+	//it is a simple element only
+	Exp c=getEndOrOverExp(condition);
+	if (c==null) return null;
+	return c;
+    }
+
+
+
+
+    public Exp getEndCondition(){
+	//Preconditions will be actions which occur only at start
+	if (condition instanceof ListExp){ //we have a list expression
+		ListExp _cond=(ListExp) condition;
+		ListExp cond=_cond.clone();
+		cond.clearElems();
+		for (Exp c: _cond){
+			Exp sub=getEndExp(c);
+			if (sub!=null) cond.add(sub);
+		}
+		return cond;
+	}
+	//it is a simple element only
+	Exp c=getEndExp(condition);
+	if (c==null) return null;
+	return c;
+    }
+
+
+
+     //returns immediate effect after ending this action
+    public Exp getEndEffect(){
+	//Preconditions will be actions which occur only at start
+	if (effect instanceof ListExp){ //we have a list expression
+		ListExp _eff=(ListExp) effect;
+		ListExp eff=_eff.clone();
+		eff.clearElems();
+		for (Exp c: _eff){
+			Exp sub=getEndExp(c);
+			if (sub!=null) eff.add(sub);
+		}
+		return eff;
+	}
+	//it is a simple element only
+	Exp e=getEndExp(effect);
+	if (e==null) return null;
+	return e;
+    }
+
+     //returns immediate effect after starting this action
+     public Exp getStartEffect(){
+	//Preconditions will be actions which occur only at start
+	if (effect instanceof ListExp){ //we have a list expression
+		ListExp _eff=(ListExp) effect;
+		ListExp eff=_eff.clone();
+		eff.clearElems();
+		for (Exp c: _eff){
+			Exp sub=getStartExp(c);
+			if (sub!=null) eff.add(sub);
+		}
+		return eff;
+	}
+	//it is a simple element only
+	Exp e=getStartExp(effect);
+	if (e==null) return null;
+	return e;
+    }
+
+     //returns immediate effect after starting this action
+     public Exp getOverEffect(){
+	//Preconditions will be actions which occur only at start
+	if (effect instanceof ListExp){ //we have a list expression
+		ListExp _eff=(ListExp) effect;
+		ListExp eff=_eff.clone();
+		eff.clearElems();
+		for (Exp c: _eff){
+			Exp sub=getOverExp(c);
+			if (sub!=null) eff.add(sub);
+		}
+		return eff;
+	}
+	//it is a simple element only
+	Exp e=getOverExp(effect);
+	if (e==null) return null;
+	return e;
+    }
+
+
+
+      //returns immediate effect after starting this action
+     public Exp getStartAndOverEffect(){
+	//Preconditions will be actions which occur only at start
+	if (effect instanceof ListExp){ //we have a list expression
+		ListExp _eff=(ListExp) effect;
+		ListExp eff=_eff.clone();
+		eff.clearElems();
+		for (Exp c: _eff){
+			Exp sub=getStartOrOverExp(c);
+			if (sub!=null) eff.add(sub);
+		}
+		return eff;
+	}
+	//it is a simple element only
+	Exp e=getStartOrOverExp(effect);
+	if (e==null) return null;
+	return e;
+    }
+ 
+
+
+
 }

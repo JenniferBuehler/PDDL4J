@@ -38,6 +38,7 @@ import java.util.Set;
 import pddl4j.exp.term.Substitution;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.Variable;
+import pddl4j.ExpVisitor;
 
 /**
  * This class implements a conditional expression of the PDDL language.
@@ -77,6 +78,8 @@ public class WhenExp extends AbstractExp {
         this.condition = condition;
         this.effect = effect;
     }
+
+
     
     /**
      * Creates a new conditional expression.
@@ -129,6 +132,10 @@ public class WhenExp extends AbstractExp {
         this.effect = effect;
     }
 
+
+    public Object accept(ExpVisitor v, Object obj){
+	return v.visitWhenExp(this,obj);
+    }
     /**
      * Returns <code>true</code> if a term occurs in this when expression.
      * 
@@ -227,8 +234,8 @@ public class WhenExp extends AbstractExp {
      * @return a hash code value for the conditional expression.
      */
     public int hashCode() {
-        return this.getExpID().hashCode() + this.condition.hashCode()
-                    + this.effect.hashCode();
+        return this.getExpID().hashCode() ^ this.condition.hashCode()
+                    ^ this.effect.hashCode();
     }
     
     /**

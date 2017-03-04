@@ -33,6 +33,7 @@ package pddl4j.exp.fexp;
 import pddl4j.EvaluationException;
 import pddl4j.exp.term.Term;
 import pddl4j.exp.term.TermID;
+import pddl4j.exp.type.Type;
 
 /**
  * This class implements the n-arity arithmetic function add.
@@ -78,19 +79,27 @@ public final class NArityAdd extends NArityOp {
                         + this.toString() + " not ground");
         try {
             double result = 0;
+	    Type resType=null;
             for (Term arg : this) {
+		if (resType==null) resType=arg.getType();
+
+		Type _resType=null;
                 if (arg.getTermID().equals(TermID.ARITHMETIC_FUNCTION)) {
                     OpExp func = (OpExp) arg;
-                    result += func.evaluate().getValue();
+		    Number res=func.evaluate();
+                    result += res.getValue();
                 } else if (arg.getTermID().equals(TermID.NUMBER)) {
                     result += ((Number) arg).getValue();
+		    _resType = ((Number) arg).getType();
                 } else {
                     throw new EvaluationException("arithmetic function "
                                 + this.toString() + ": argument " + arg
                                 + " is not evaluable");
                 }
+		if (resType.isSubTypeOf(_resType)) resType=_resType;
             }
-            return new Number(result);
+	    if (resType==null) throw new NullPointerException("Type should not be null here");
+            return new Number(result,resType);
         } catch (ArithmeticException e) {
             throw new EvaluationException("arithmetic function "
                                 + this.toString() + ": " + e.getMessage(), e);
