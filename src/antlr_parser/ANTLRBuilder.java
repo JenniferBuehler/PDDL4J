@@ -26,7 +26,8 @@ import static PDDL4J.antlr_gen.PddlParser.*;
  * to ensure type consistency. If this is set to null, it means that in case this expression is to be evaluated on an existing
  * predicate/function, the variables bound by this predicate are to be used.
  *
- * @author Jennifer Buehler
+ * @author Jennifer Buehler, modified and based on code written by Zeyn Saigol
+ * http://www.zeynsaigol.com/software/graphplanner.html
  */
 public abstract class ANTLRBuilder
 {

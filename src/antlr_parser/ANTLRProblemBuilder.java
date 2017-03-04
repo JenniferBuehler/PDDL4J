@@ -19,7 +19,8 @@ import pddl4j.exp.fexp.*;
  * PDDL file using ANTLR, and then walking the ANTLR syntax tree to create the
  * appropriate strongly-typed objects.
  *
- * @author Jennifer Buehler
+ * @author Jennifer Buehler, modified and based on code written by Zeyn Saigol
+ * http://www.zeynsaigol.com/software/graphplanner.html
  */
 public class ANTLRProblemBuilder extends ANTLRBuilder
 {
