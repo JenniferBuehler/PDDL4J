@@ -4,7 +4,7 @@
  * School of Computer Science
  * University of Birmingham
  *
- * $Id: Pddl.g 120 2008-10-02 14:59:50Z zas $
+ * Added support for PDDL 3.1 by Jennifer Buehler
  */
 grammar Pddl;
 options {
