@@ -1,6 +1,6 @@
 # PDDL4J
 
-Modification of an older PDDL4J version which still was using the expression structure (``class Exp`` types)
+Modification of an older PDDL4J version which still was using the expression structure (``interface Exp`` types)
 including ``class Substitution`` which allowed for substituting variables in expressions.
 
 A few extensions were made, including support for PDDL 3.1, parsing with ANTLR generated files
