@@ -1,3 +1,11 @@
+# PDDL4J
+
+Modification of an older PDDL4J version which still was using the expression structure (``class Exp`` types)
+including ``class Substitution`` which allowed for substituting variables in expressions.
+
+A few extensions were made, including support for PDDL 3.1, parsing with ANTLR generated files
+and fixing a few bugs. For a detailed list of modifications please refer to [MODIFICATIONS.md](MODIFICATIONS.md).
+
 # Installation
 
 ## 1. Install JAVA (at least v 1.6)
@@ -57,5 +65,7 @@ To generate the parser code:
 cd <your-path-to-this-repo>/PDDL4J
 java -jar libs/jar/antlr-3.5.2-complete-no-st3.jar -o antlr_gen Pddl.g``
 ```
+
+(or use your other antlr library instead of the provided one)
 
 This will have generate the parser code and put it in the directory ``antlr_gen``.
