@@ -69,3 +69,43 @@ java -jar libs/jar/antlr-3.5.2-complete-no-st3.jar -o antlr_gen Pddl.g``
 (or use your other antlr library instead of the provided one)
 
 This will have generate the parser code and put it in the directory ``antlr_gen``.
+
+
+# Usage
+
+## Simple API test
+
+A very simple test file is provided in the file [pddl4j/tests/TestCNF.java](src/pddl4j/tests/TestCNF.java).
+This is a file with some simple examples which you can modify to play around with the API a little.
+
+```
+cd build
+java pddl4j.tests.TestCNF
+```
+
+
+## Parse a PDDL file
+
+You can use the test parser in the file [antlr_parser/TestParser.java](src/antlr_parser/TestParser.java) which
+just parses a PDDL domain and problem file and prints it on the screen.
+
+
+```
+cd build
+java -cp ../libs/jar/antlr-3.5.2-complete-no-st3.jar:PDDL4J.jar\
+       PDDL4J.antlr_parser.TestParser \
+       <domain-file>.pddl <problem-file>.pddl
+```
+
+For example, parse the blocks world:
+
+```
+java -cp ../libs/jar/antlr-3.5.2-complete-no-st3.jar:PDDL4J.jar \
+      PDDL4J.antlr_parser.TestParser \
+      ../pddl/blockworld/blocksworld.pddl \
+      ../pddl/blockworld/pb2.pddl
+```
+
+You can of course shorten the command by putting the directories of ``PDDL4J.jar`` and the
+antlr library (in this example ``antlr-3.5.2-complete-no-st3.jar``) into your ``CLASSPATH``,
+or moving the .jar files to a directory which is in your ``CLASSPATH``.
