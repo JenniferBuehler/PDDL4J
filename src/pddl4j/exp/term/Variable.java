@@ -42,7 +42,7 @@ import pddl4j.ExpVisitor;
 /**
  * This class implements a variable.
  * 
- * @author Damien Pellier
+ * @author Damien Pellier, modifications by Jennifer Buehler
  * @version 1.0 
  */
 public class Variable extends AbstractTerm {

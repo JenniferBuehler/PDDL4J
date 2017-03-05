@@ -43,18 +43,21 @@ import java.util.ArrayList;
 
 
 /**
- * This is a composition of several types, so an object with this type
- * can be either of the types in this set 
+ * Specialization of Type which is a composition of several types.
+ * @author Damien Pellier, modifications by Jennifer Buehler
+ * @version 1.0can be either of the types in this set
  */
 public final class TypeSet extends Type {
 
   private Collection<Type> types;
 
-    /**
-     * Creates a new type set consisting of these types.
-     */
+  /**
+   * Creates a new type set consisting of these types.
+   */
   public TypeSet(Collection<Type> _types) {
-    super("CompilerFix"); //have to call empty constructor of superclass first thing. Though we are going to construct its parents here.
+  // have to call empty constructor of superclass for compiler.
+  // Though we are going to construct its parents here.
+    super("CompilerFix"); 
 
       if (_types == null) 
        throw new NullPointerException();
@@ -63,10 +66,11 @@ public final class TypeSet extends Type {
       }
 
       Set<Type> allParents=new LinkedHashSet<Type>();
-      //construct anonymous typename:
+      //construct anonymous type name:
       String _image=new String("");
       for (Type t: _types) {
-        if (t instanceof TypeSet) throw new RuntimeException("don't make a TypeSet of TypeSets! "+_types);
+        if (t instanceof TypeSet)
+           throw new RuntimeException("don't make a TypeSet of TypeSets! "+_types);
         _image+=t+"_";
         allParents.addAll(t.getParentTypes());
       }
@@ -93,30 +97,28 @@ public final class TypeSet extends Type {
     return cloneT;
   }
 
-  //returns true if this type is either the same, or a subtype
-  //of the other.
+  // returns true if this type is either the same, or a subtype
+  // of the other.
   public boolean isSubTypeOf(Type other){
     if (isSameType(other)) return true;
 
     if (other instanceof TypeSet) {
-      System.out.println("This happens! "+this+" , "+other+" - "+getClass().getName());
       TypeSet otherTypeSet=(TypeSet) other;
       for (Type ot: otherTypeSet.types) {
         for (Type t: types) {
           if (t.isSubTypeOf(ot)) return true;
         }
       }
-    }else{
-      System.out.println("!This happens!!! "+this+" , "+other+" - "+getClass().getName());
+    } else {
       for (Type t: types) {
-        //System.out.println("Checking if "+t+" is subset of "+other);
+        // System.out.println("Checking if "+t+" is subset of "+other);
         if (t.isSubTypeOf(other)) return true;
       }
     }
     return false;
   }
 
-  //helper function for isSubTypeOf
+  // overwriting of superclass
   protected boolean containedInParents(Set<Type> parentsSet) {
     //System.out.println("See if  "+this+" is contained in parents "+parentsSet);
     for (Type t: types) {

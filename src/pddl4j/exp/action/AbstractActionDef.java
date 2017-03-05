@@ -42,7 +42,7 @@ import pddl4j.exp.term.Substitution;
  * This class implements the common structures and method shares by all PDDL
  * action.
  * 
- * @author Damien Pellier
+ * @author Damien Pellier, modifications by Jennifer Buehler
  * @version 1.0
  */
 public abstract class AbstractActionDef implements ActionDef {

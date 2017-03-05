@@ -111,10 +111,9 @@ public class Type implements Serializable, Cloneable {
     }
    
     public Object clone() {
-        Set<Type> parents = (Set<Type>) ((LinkedHashSet<Type>)parentTypes).clone();
-	return new Type(new String(this.image),parents);	
+      Set<Type> parents = (Set<Type>) ((LinkedHashSet<Type>)parentTypes).clone();
+      return new Type(new String(this.image),parents);    
     }
-
  
     /**
      * Returns the image of this type.
@@ -124,22 +123,23 @@ public class Type implements Serializable, Cloneable {
     public String getImage() {
         return this.image;
     }
+
     final protected void setImage(String s){
-	this.image=s;
+        this.image=s;
     }
 
     //returns true if this type is either the same, or a subtype
     //of the other.
     public boolean isSubTypeOf(Type other){
-	// it is necessary to use isSameType(), and containedIn(),
-        // instead of parentTypes.contains(), because
-	// "other" could be of another type which has to do a different check
-	return (other.isSameType(this)) || other.containedInParents(parentTypes);
+      // it is necessary to use isSameType(), and containedIn(),
+          // instead of parentTypes.contains(), because
+      // "other" could be of another type which has to do a different check
+      return (other.isSameType(this)) || other.containedInParents(parentTypes);
     }
 
     //helper function for isSubTypeOf
     protected boolean containedInParents(Set<Type> parentsSet){
-	return parentsSet.contains(this);	
+      return parentsSet.contains(this);    
     }
 
     /**
@@ -161,31 +161,31 @@ public class Type implements Serializable, Cloneable {
      * type is a subtype of the other, but a common parent might exist.
      */
     public Type getCommonParentWith(Type other){
-	Set<Type> intersect = new LinkedHashSet(this.getParentTypes());
-        intersect.retainAll(other.getParentTypes());
-	if (intersect.isEmpty()) return null;
-	
-	Type ret=null;
-	//return the parent lowest in the hierarchy from the intersection
-	int maxHier=-1;
-	for (Type t: intersect){
-		if (t.parentTypes.size()>maxHier){
-			maxHier=t.parentTypes.size();
-			ret=t;
-		}
-	}
-	return ret;
+        Set<Type> intersect = new LinkedHashSet(this.getParentTypes());
+            intersect.retainAll(other.getParentTypes());
+        if (intersect.isEmpty()) return null;
+        
+        Type ret=null;
+        //return the parent lowest in the hierarchy from the intersection
+        int maxHier=-1;
+        for (Type t: intersect){
+            if (t.parentTypes.size()>maxHier){
+                maxHier=t.parentTypes.size();
+                ret=t;
+            }
+        }
+        return ret;
     }
 
     /**
      * @return the set of parent types of this type.
      */
     public Set<Type> getParentTypes() {
-	return parentTypes;
+        return parentTypes;
     }
 
     final protected void setParentTypes(Set<Type> p) {
-	parentTypes=p;
+        parentTypes=p;
     }   
      
     /**
@@ -200,9 +200,9 @@ public class Type implements Serializable, Cloneable {
      */
     public boolean equals(Object obj) {
         if ((obj != null) && obj.getClass().equals(this.getClass())) {
-		return isSameType((Type)obj);
-	}
-	return false;
+            return isSameType((Type)obj);
+        }
+        return false;
     }
 
     /**
@@ -229,7 +229,7 @@ public class Type implements Serializable, Cloneable {
     }
     
 
-     public String toDetailedString() {
+    public String toDetailedString() {
         StringBuffer str = new StringBuffer();
         str.append(this.image);
         str.append("[");
@@ -243,13 +243,10 @@ public class Type implements Serializable, Cloneable {
         str.append("]");
         return str.toString();
     }
-
  
     private static Set<Type> asSet(Type t){
-	Set<Type> ret=new LinkedHashSet<Type>();
-	ret.add(t);
-	return ret;
+        Set<Type> ret=new LinkedHashSet<Type>();
+        ret.add(t);
+        return ret;
     }
-   
-   
 }

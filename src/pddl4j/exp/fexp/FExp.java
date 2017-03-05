@@ -36,7 +36,6 @@ import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 import java.util.Collection;
 
 import pddl4j.EvaluationException;
@@ -53,7 +52,7 @@ import pddl4j.ExpVisitor;
 /**
  * This class implements a function expression in the PDDL language.
  * 
- * @author Damien Pellier
+ * @author Damien Pellier, modifications by Jennifer Buehler
  * @version 1.0 
  */
 public abstract class FExp extends AbstractTerm implements Iterable<Term> {

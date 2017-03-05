@@ -43,7 +43,7 @@ import pddl4j.exp.term.Substitution.Binding;
 /**
  * This class implements a substitution.
  * 
- * @author Damien Pellier
+ * @author Damien Pellier, modifications by Jennifer Buehler
  * @version 1.0 
  */
 public final class Substitution implements Serializable, Cloneable, Iterable<Binding> {

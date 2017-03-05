@@ -245,19 +245,6 @@ public abstract class ListExp extends AbstractExp implements Iterable<Exp> {
         }
         return other;
     }
-
-    private static boolean allVariablesBound(Exp e, Substitution sigma){
-        Set<Variable> vars=e.getFreeVariables();
-        if ((vars==null) || vars.isEmpty()) return true;
-        for (Variable v: vars){
-            Term binding=sigma.getBinding(v);
-            if (binding==null) return false;
-            //if we have a binding, we still would have to check whether the variable is ground!
-            //if not, we have to follow the chain and see if it's indirectly bound...
-        }
-        return true;
-    }
-
  
     /**
      * Returns <code>true</code> if the expression is ground.

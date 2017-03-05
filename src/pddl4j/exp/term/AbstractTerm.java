@@ -124,21 +124,6 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
         return this.type;
     }
 
-    /**
-     * Sets a new type (the only one) to this term.
-     * @throws NullPointerException if <code>type == null</code>.
-     * @throws IllegalStateException if there is more than one type in the type set..
-     */
-    /*public void replaceOnlyType(Type t) {
-        if (this.type == null) 
-            throw new NullPointerException();
-	if (this.type.size()!=1)
-            throw new IllegalStateException("Can't replace only type because we have not exactly one: "+this.type.size());
-        this.type.clear();
-	this.type.add(t);
-    }*/
-
- 
     
     /**
      * Sets a new type to this term.
@@ -151,23 +136,6 @@ public abstract class AbstractTerm extends AbstractExp implements Term {
             throw new NullPointerException();
         this.type = t;
     }
-    
-   /* /**
-     * Returns <code>true</code> if this term is an instance of a specified
-     * type. Specially, this method returns <code>true</code> if the type
-     * of this term is the equal to the specified type or if the type of this
-     * term is a subtype of the specified type.
-     * 
-     * @param type the type.
-     * @return <code>true</code> if this type is an instance of a specified
-     *         type; <code>false</code> otherwise.
-     * @throws NullPointerException if <code>type == null</code>.
-     */
-   /* public boolean isInstanceOf(Type type) {
-        if (type == null)
-            throw new NullPointerException();
-        return this.gequals(type) || type.getAllSubTypes().contains(this);
-    }*/
     
     /**
      * Returns a deep copy of this term.

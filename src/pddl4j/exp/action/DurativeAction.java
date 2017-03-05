@@ -47,7 +47,7 @@ import pddl4j.exp.time.OverTimedExp;
 /**
  * This class implements a durative action of the PDDl language.
  * 
- * @author Damien Pellier
+ * @author Damien Pellier, modifications by Jennifer Buehler
  * @version 1.0 
  */
 public class DurativeAction extends AbstractActionDef {

@@ -270,7 +270,8 @@ public abstract class ANTLRBuilder
 
 		Tree paramNode=gdNode.getChild(1);
 		AtomicFormula origPredicate = findPredicate(name,base);
-		if (origPredicate==null) throw new InvalidPDDLElementException("original predicate "+name+" not found. "+" line "+gdNode.getLine());
+		if (origPredicate==null)
+      throw new InvalidPDDLElementException("original predicate "+name+" not found. "+" line "+gdNode.getLine());
 	
 		if (paramNode.getChildCount() != origPredicate.getArity()) {
 			throw new InvalidPDDLElementException("Wrong number of arguments (in child node) used for predicate "+ 
@@ -293,10 +294,13 @@ public abstract class ANTLRBuilder
 			Type origType=oaIt.next().getType();
 			Term argCopy=arg.clone();
 			Type argType=arg.getType();
-			if ((argType.equals(Type.NUMBER) || argType.isSubTypeOf(Type.NUMBER)) && origType.isSubTypeOf(Type.NUMBER)){
-				// XXX added the || argType.isSubTypeOf() so that predicates of number type are ALWAYS the parent predicates
-				// FIX: absTermParameterList at this stage is not able to do type checks for numbers so we might have to enforce
-				// number types here
+			if ((argType.equals(Type.NUMBER) ||
+           argType.isSubTypeOf(Type.NUMBER)) &&
+          origType.isSubTypeOf(Type.NUMBER)){
+				// Added the || argType.isSubTypeOf() so that predicates of number type
+        // are ALWAYS the parent predicates
+				// FIX: absTermParameterList at this stage is not able to do type checks for numbers
+        // so we might have to enforce number types here
 				// System.out.println("Goal predicate: Enforcing right number type "+origType+", line "+gdNode.getLine());
 				argCopy.setType(origType);
 			}else if (!compatibleType(origType,arg.getType())) {
